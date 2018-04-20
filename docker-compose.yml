@@ -1,0 +1,32 @@
+version: "3.6"
+
+services:
+  harvest_tweets_streaming:
+    build: ./harvest-tweets-streaming
+    image: 127.0.0.1:5000/harvest-tweets-streaming
+    depends_on:
+      - rabbitmq
+    environment:
+      - RABBITMQ_USER=rabbitmq
+      - RABBITMQ_PASS=jerseygrapefruitpetrolcalcium
+      - PYTHONUNBUFFERED=1
+
+  remove_duplicate_tweets:
+    build: ./remove-duplicate-tweets
+    image: 127.0.0.1:5000/remove-duplicate-tweets
+    depends_on:
+      - rabbitmq
+      # - couchdb_reverse_proxy
+    environment:
+      - RABBITMQ_USER=rabbitmq
+      - RABBITMQ_PASS=jerseygrapefruitpetrolcalcium
+      - PYTHONUNBUFFERED=1
+
+  rabbitmq:
+    image: 127.0.0.1:5000/rabbitmq:3-management-alpine
+    ports:
+      - "15672:15672"
+    environment:
+      - RABBITMQ_ERLANG_COOKIE=QYJHJRUWSOCYIBEGEQJI
+      - RABBITMQ_DEFAULT_USER=rabbitmq
+      - RABBITMQ_DEFAULT_PASS=jerseygrapefruitpetrolcalcium
