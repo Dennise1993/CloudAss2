@@ -10,29 +10,17 @@
 '''
 	task 1: get the tweets
 	task 2: connect with couchdb
-	task 3: write the tweets into couchdb without duplication
+	task 3: process the tweet
+	task 4: write the tweets into couchdb without duplication
 '''
-
+import config
 from tweepy import OAuthHandler
-from tweepy.streaming import StreamListener
-from tweepy import Stream
+import tweepy
 import couchdb
 import sys
-import json
+from twitterStream import TweetStreamListener
+from twitterSearch import SearchTweets
 
-# authorization twitter
-consumer_key = "rnTkKGP6DxU9mMWW2OLqJMmFm"
-consumer_secret = "yfVdaJQ8gMx8qmXB3SsLihgvYT1pAf1ym0sVqJFxcdqM9tpPlH"
-access_token = "985810706086768640-ZFr3TOIbf7A2jOX4VMc3JF9TnFIQOJz"
-access_token_secret = "l2nfGcETTkTTeUjzK6w5iwAx7kDSvg85TSdcxkcE5url4"
-
-# the url of the couchdb
-# the type is http://[yourDatabaseName]:[yourPassword]@localhost:5984
-server_url = "http://admin:admin@localhost:5984/"
-db_name = "ccc_ass2"
-
-# the coordinator of Melbourne,just for testing
-coordinators = [144.5937, -37.9994, 145.4013, -37.5113]
 
 def connect_database(url, db_name):
 	try:
@@ -44,49 +32,35 @@ def connect_database(url, db_name):
 			db = couch.create(db_name)
 	except Exception as e:
 		print(Exception)
-		sys.exit(2)
+		sys.exit(1)
 	return db
 
-db = connect_database(server_url, db_name)
 
-def save_tweet(doc, db):
-	# use id_str of tweet as the key of the table
-	doc['_id'] = doc['id_str']
-	db.save(doc)
+if __name__=='__main__':
+	if len(sys.argv) != config.NUM_ARGS:
+	 	print("Please input the correct arguments: <mode(search or stream)>")
+	 	sys.exit(1)
 
-class TweetListener(StreamListener):
-	def on_status(self, status):
-		print(status.text)
+	mode = sys.argv[1] 
+	# get twitter authorization
+	auth = OAuthHandler(config.consumer_key, config.consumer_secret)
+	auth.set_access_token(config.access_token, config.access_token_secret)
+	db = connect_database(config.server_url, config.db_name)
 
-	def on_data(self, tweet):
+	print("be ready to collect tweets")
+	if mode == 'stream':
 		try:
-			# convert the tweet into json type
-			tweet_json = json.loads(tweet)
-
-			#########################################
-
-			# add process here
-
-			#########################################
-
-			# save the tweet into the couchdb
-			save_tweet(tweet_json, db)
-			print("add tweet: " + tweet_json["id_str"])
+			streamListener = TweetStreamListener(db)
+			streamer = tweepy.Stream(auth = auth, listener = streamListener)
+			streamer.filter(locations = config.coordinators)
 		except Exception as e:
-			print(e)
+			print("exists error")
+			streamer.disconnect()
+			sys.exit(1)
 
-		#remove duplication	
-		except couchdb.http.ResourceConflict:
-			print("already exists this tweet")
-
-	def on_error(self, status_code):
-		print(status_code)
-
-
-# get twitter authorization
-auth = OAuthHandler(consumer_key, consumer_secret)
-auth.set_access_token(access_token, access_token_secret)
-
-print("be ready to collect tweet")
-streamer = Stream(auth, TweetListener())
-streamer.filter(locations = coordinators)
+	elif mode == 'search':
+		api = tweepy.API(
+            			auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True
+        				)
+		search_tweets =  SearchTweets(db, api)
+		search_tweets.search()
