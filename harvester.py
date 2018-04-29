@@ -20,6 +20,7 @@ import couchdb
 import sys
 from twitterStream import TweetStreamListener
 from twitterSearch import SearchTweets
+import process
 
 
 def connect_database(url, db_name):
@@ -47,10 +48,12 @@ if __name__=='__main__':
 	auth.set_access_token(config.access_token, config.access_token_secret)
 	db = connect_database(config.server_url, config.db_name)
 
+	aus_polygon = process.read_map("./aus_lga.geojson.json")
+
 	print("be ready to collect tweets")
 	if mode == 'stream':
 		try:
-			streamListener = TweetStreamListener(db)
+			streamListener = TweetStreamListener(db, aus_polygon)
 			streamer = tweepy.Stream(auth = auth, listener = streamListener)
 			streamer.filter(locations = config.coordinators)
 		except Exception as e:

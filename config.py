@@ -2,15 +2,15 @@
 # hold config information
 	
 # authorization twitter
-consumer_key = "rnTkKGP6DxU9mMWW2OLqJMmFm"
-consumer_secret = "yfVdaJQ8gMx8qmXB3SsLihgvYT1pAf1ym0sVqJFxcdqM9tpPlH"
-access_token = "985810706086768640-ZFr3TOIbf7A2jOX4VMc3JF9TnFIQOJz"
-access_token_secret = "l2nfGcETTkTTeUjzK6w5iwAx7kDSvg85TSdcxkcE5url4"
+consumer_key = "gHLBdGbr6BGAsORWeCUDnjVK8"
+consumer_secret = "OhcP7O0AdfFAgLyb1KfNjg4KCQ90Pjh7zCGwnv1tAVvOUUaXQL"
+access_token = "775515873595359232-e5H9Fo5B4Kaz0i83L1oWIp86HuNWIf7"
+access_token_secret = "q16pw33BjTyfxrosoJiCycBqNm81el3ip2F9mU4oo5RDa"
 
 # the url of the couchdb
 # the type is http://[yourDatabaseName]:[yourPassword]@localhost:5984
 server_url = "http://admin:admin@localhost:5984/"
-db_name = "ccc_ass2"
+db_name = "test"
 
 # the coordinator of Australia,just for testing
 ##########################################################

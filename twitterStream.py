@@ -11,8 +11,9 @@ def save_tweet(doc, db):
 	db.save(doc)
 
 class TweetStreamListener(StreamListener):
-	def __init__(self, db):
+	def __init__(self, db, aus_polygon):
 		self.db = db
+		self.aus_polygon = aus_polygon
 
 	def on_status(self, status):
 		print(status.text)
@@ -23,7 +24,7 @@ class TweetStreamListener(StreamListener):
 			tweet_json = json.loads(tweet)
 
 			# process tweet
-			updated_tweet = process.process(tweet_json)
+			updated_tweet = process.process(tweet_json, self.aus_polygon)
 
 			# save the tweet into the couchdb
 			save_tweet(updated_tweet, self.db)
