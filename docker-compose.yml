@@ -16,7 +16,6 @@ services:
     image: 127.0.0.1:5000/remove-duplicate-tweets
     depends_on:
       - rabbitmq
-      # - couchdb_reverse_proxy
     environment:
       - RABBITMQ_USER=rabbitmq
       - RABBITMQ_PASS=jerseygrapefruitpetrolcalcium
@@ -30,3 +29,16 @@ services:
       - RABBITMQ_ERLANG_COOKIE=QYJHJRUWSOCYIBEGEQJI
       - RABBITMQ_DEFAULT_USER=rabbitmq
       - RABBITMQ_DEFAULT_PASS=jerseygrapefruitpetrolcalcium
+
+  api_server:
+    build: ./api-server
+    image: 127.0.0.1:5000/api-server
+    deploy:
+      replicas: 3
+    ports:
+      - "3000:3000"
+    environment:
+      - DEBUG=*
+      - NODE_ENV=production
+      - COUCHDB_USER=admin
+      - COUCHDB_PASSWORD=admin
