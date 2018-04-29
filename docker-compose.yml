@@ -10,6 +10,23 @@ services:
       - RABBITMQ_USER=rabbitmq
       - RABBITMQ_PASS=jerseygrapefruitpetrolcalcium
       - PYTHONUNBUFFERED=1
+      - CONSUMER_KEY = "rnTkKGP6DxU9mMWW2OLqJMmFm"
+      - CONSUMER_SECRET = "yfVdaJQ8gMx8qmXB3SsLihgvYT1pAf1ym0sVqJFxcdqM9tpPlH"
+      - ACCESS_TOKEN = "985810706086768640-ZFr3TOIbf7A2jOX4VMc3JF9TnFIQOJz"
+      - ACCESS_TOKEN_SECRET = "l2nfGcETTkTTeUjzK6w5iwAx7kDSvg85TSdcxkcE5url4"
+      - COORDINATORS = [130.096982, -24.551835, 153.369916, -10.512868]
+
+  process_tweets:
+    build: ./process-tweets
+    image: 127.0.0.1:5000/process-tweets
+    depends_on:
+      - rabbitmq
+    environment:
+      - RABBITMQ_USER=rabbitmq
+      - RABBITMQ_PASS=jerseygrapefruitpetrolcalcium
+      - PYTHONUNBUFFERED=1
+      - KEY_WORDS = ["#auspol", "#LNP", "#ALP", "#Greens", "#Labor", "#Liberal", "#Liberals",
+            "#Libs", "#BillShorten", "#Shorten", "#MalcolmTurnbull", "#Turnbull", "#LNPfail"]
 
   remove_duplicate_tweets:
     build: ./remove-duplicate-tweets
@@ -21,6 +38,8 @@ services:
       - RABBITMQ_USER=rabbitmq
       - RABBITMQ_PASS=jerseygrapefruitpetrolcalcium
       - PYTHONUNBUFFERED=1
+      - SERVER_URL="http://admin:admin@couchdb:5984/"
+      - DB_NAME="ccc_tweets"
 
   rabbitmq:
     image: 127.0.0.1:5000/rabbitmq:3-management-alpine
