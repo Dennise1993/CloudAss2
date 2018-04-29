@@ -6,10 +6,7 @@ RUN apt-get update && \
         make \
         gcc \
         locales \
-        libgdal20 libgdal-dev && \
-    python -m pip install \
-        shapely \
-        --pre --no-binary shapely
+        libgdal20 libgdal-dev
 
 WORKDIR /usr/src/app
 

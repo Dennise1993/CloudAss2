@@ -1,4 +1,4 @@
 pika==0.11.2
 geopy==1.13.0
 textblob==0.15.1
-
+shapely
