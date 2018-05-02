@@ -54,6 +54,16 @@ services:
       - COUCHDB_USER=admin
       - COUCHDB_PASSWORD=admin
 
+  front_end:
+    build: ./front-end
+    image: 127.0.0.1:5000/front-end
+    deploy:
+      replicas: 3
+    networks:
+      - frontend
+    ports:
+      - "80:80"
+
 networks:
   backend:
     external: true
