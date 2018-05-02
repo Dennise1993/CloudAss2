@@ -4,6 +4,8 @@ services:
   harvest_tweets_streaming:
     build: ./harvest-tweets-streaming
     image: 127.0.0.1:5000/harvest-tweets-streaming
+    networks:
+      - backend
     depends_on:
       - rabbitmq
     environment:
@@ -14,17 +16,21 @@ services:
   remove_duplicate_tweets:
     build: ./remove-duplicate-tweets
     image: 127.0.0.1:5000/remove-duplicate-tweets
+    networks:
+      - backend
     depends_on:
       - rabbitmq
-    networks:
-      - couchdb-network
     environment:
       - RABBITMQ_USER=rabbitmq
       - RABBITMQ_PASS=jerseygrapefruitpetrolcalcium
+      - COUCHDB_USER=admin
+      - COUCHDB_PASSWORD=admin
       - PYTHONUNBUFFERED=1
 
   rabbitmq:
     image: 127.0.0.1:5000/rabbitmq:3-management-alpine
+    networks:
+      - backend
     ports:
       - "15672:15672"
     environment:
@@ -38,7 +44,8 @@ services:
     deploy:
       replicas: 3
     networks:
-      - couchdb-network
+      - backend
+      - frontend
     ports:
       - "3000:3000"
     environment:
@@ -48,5 +55,7 @@ services:
       - COUCHDB_PASSWORD=admin
 
 networks:
-  couchdb-network:
+  backend:
     external: true
+  frontend:
+    driver: overlay

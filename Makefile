@@ -7,10 +7,9 @@ start-swarm:
 	  --driver overlay \
 	  --subnet 10.0.9.0/24 \
 	  --opt encrypted \
-	  couchdb-network
+	  backend
 
 	# Create the registry
-	# TODO - secure the registry in "prod"
 	docker service create --name registry --publish published=5000,target=5000 registry:2
 
 	# Build the images and push them to the registry
@@ -29,7 +28,7 @@ start-swarm:
 	# --mount type=bind,source=/home/ubuntu/common,destination=/common \
 
 	# TODO - change credentials
-	docker service create --replicas 3 --name couchdb --network couchdb-network \
+	docker service create --replicas 3 --name couchdb --network backend \
 	  --hostname="couchdb{{.Task.Slot}}" \
 	  -e COUCHDB_COOKIE="mycookie" \
 	  -e COUCHDB_USER="admin" \
@@ -54,7 +53,7 @@ stop-swarm:
 	docker service rm couchdb
 
 	# Remove the network
-	docker network rm couchdb-network
+	docker network rm backend
 
 	# Exit swarm mode
 	docker swarm leave --force
