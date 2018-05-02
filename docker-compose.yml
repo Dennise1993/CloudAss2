@@ -16,6 +16,8 @@ services:
     image: 127.0.0.1:5000/remove-duplicate-tweets
     depends_on:
       - rabbitmq
+    networks:
+      - couchdb-network
     environment:
       - RABBITMQ_USER=rabbitmq
       - RABBITMQ_PASS=jerseygrapefruitpetrolcalcium
@@ -35,6 +37,8 @@ services:
     image: 127.0.0.1:5000/api-server
     deploy:
       replicas: 3
+    networks:
+      - couchdb-network
     ports:
       - "3000:3000"
     environment:
@@ -42,3 +46,7 @@ services:
       - NODE_ENV=production
       - COUCHDB_USER=admin
       - COUCHDB_PASSWORD=admin
+
+networks:
+  couchdb-network:
+    external: true
