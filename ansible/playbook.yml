@@ -1,0 +1,61 @@
+- hosts: cloudHost
+  sudo: yes
+  sudo_user: root
+  tasks:
+    - name: update
+      apt: update_cache=yes
+
+# install all the python-package, python and pip
+    - name: Install python
+      apt: pkg=python state=latest
+    - name: install pip
+      apt: pkg=python-pip state=latest
+# install docker  
+    - name: Install Docker and role dependencies
+      apt:
+        name: "{{ item }}"
+        state: "present"
+        install_recommends: False
+      with_items:
+        - "apt-transport-https"
+        - "ca-certificates"
+        - "software-properties-common"
+        - "cron"
+
+    - name: Get upstream APT GPG key
+      apt_key: url=https://download.docker.com/linux/ubuntu/gpg
+      id: "{{ docker_apt_key }}"
+      keyserver: "{{ ansible_local.core.keyserver
+                     if (ansible_local|d() and ansible_local.core|d() and
+                         ansible_local.core.keyserver)
+                     else 'hkp://pool.sks-keyservers.net' }}"
+      state: "present"
+    - name: Configure upstream APT repository
+      apt_repository:
+        repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ansible_distribution_release}} stable
+        state: "present"
+        update_cache: True
+    - name: Install Docker
+      apt:
+        name: "docker-ce"
+    - name: Remove Upstart config file
+      file:
+        path: "/etc/default/docker"
+        state: "absent"
+# Install the docker compose
+    - name: Ensure docker-compose is installed and available
+      get_url: 
+        url : https://github.com/docker/compose/releases/download/1.21.0/docker-compose-{{ ansible_system }}-{{ ansible_userspace_architecture }}
+        dest: /usr/local/bin/docker-compose
+        mode: '+x'
+
+# Download file from Github
+    # - git:
+    #     repo: https://github.com/Dennise1993/CloudAss2.git
+    #     dest: /mnt/ansible-examples
+    #     archive: /mnt/ansible-examples.zip
+# Go to the folder and execute command
+    - name: Go to the folder and execute command
+      command: chdir=/mnt/CloudAss2-docker_backend ./start.sh
+
+
