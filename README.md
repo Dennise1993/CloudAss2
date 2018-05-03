@@ -5,11 +5,16 @@ Required libraries on your local machine:
 1. Python 3
 2. Boto library for Python 3.
 
-Ansible install via pip.(http://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html#latest-releases-via-pip)
-python FinalBOTO.py the output is ansible_hosts.
-Execute the ansible command
-     ansible-playbook playbook.yml -i ansible_hosts -u ubuntu
+Install ansible via pip.(http://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html#latest-releases-via-pip)
 
+```
+python FinalBOTO.py 
+```
+the output is ansible_hosts.
+Execute the ansible command
+```     
+ansible-playbook playbook.yml -i ansible_hosts -u ubuntu
+```
 The ansible_hosts will be used.
 
 ## Docker
