@@ -1,0 +1,6 @@
+pika==0.11.2
+geopy==1.13.0
+textblob==0.15.1
+shapely
+pyenchant==2.0.0
+html2text==2018.1.9

@@ -12,6 +12,42 @@ services:
       - RABBITMQ_USER=rabbitmq
       - RABBITMQ_PASS=jerseygrapefruitpetrolcalcium
       - PYTHONUNBUFFERED=1
+      - CONSUMER_KEY=gHLBdGbr6BGAsORWeCUDnjVK8
+      - CONSUMER_SECRET=OhcP7O0AdfFAgLyb1KfNjg4KCQ90Pjh7zCGwnv1tAVvOUUaXQL
+      - ACCESS_TOKEN=775515873595359232-e5H9Fo5B4Kaz0i83L1oWIp86HuNWIf7
+      - ACCESS_TOKEN_SECRET=q16pw33BjTyfxrosoJiCycBqNm81el3ip2F9mU4oo5RDa
+      - COORDINATORS=[130.096982, -24.551835, 153.369916, -10.512868]
+
+  harvest_tweets_search:
+    build: ./harvest-tweets-search
+    image: 127.0.0.1:5000/harvest-tweets-search
+    networks:
+      - backend
+    depends_on:
+      - rabbitmq
+    environment:
+      - RABBITMQ_USER=rabbitmq
+      - RABBITMQ_PASS=jerseygrapefruitpetrolcalcium
+      - PYTHONUNBUFFERED=1
+      - CONSUMER_KEY=gHLBdGbr6BGAsORWeCUDnjVK8
+      - CONSUMER_SECRET=OhcP7O0AdfFAgLyb1KfNjg4KCQ90Pjh7zCGwnv1tAVvOUUaXQL
+      - ACCESS_TOKEN=775515873595359232-e5H9Fo5B4Kaz0i83L1oWIp86HuNWIf7
+      - ACCESS_TOKEN_SECRET=q16pw33BjTyfxrosoJiCycBqNm81el3ip2F9mU4oo5RDa
+      - SEARCH_RANGE=-24.24,133.416667,1000km
+
+  process_tweets:
+    build: ./process-tweets
+    image: 127.0.0.1:5000/process-tweets
+    networks:
+      - backend
+    depends_on:
+      - rabbitmq
+    environment:
+      - RABBITMQ_USER=rabbitmq
+      - RABBITMQ_PASS=jerseygrapefruitpetrolcalcium
+      - PYTHONUNBUFFERED=1
+      - POLITICS_KEY_WORDS=#auspol,#LNP,#ALP,#Greens,#Labor,#Liberal,#Liberals,#Libs,#BillShorten,#Shorten,#MalcolmTurnbull,#Turnbull,#LNPfail
+      - JUNK_FOOD_KEY_WORDS_FILE=junkfood.txt
 
   remove_duplicate_tweets:
     build: ./remove-duplicate-tweets
