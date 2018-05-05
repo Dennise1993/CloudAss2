@@ -54,18 +54,22 @@ def reverseGeoLocation(updated_tweet, aus_polygon):
 
 
 def identifyPoliticalTweets(updated_tweet):
-    # identify whether there are policies keywords
-    updated_tweet['politicalHashtag'] = []
+    # identify whether there are policies keywords, if not the "politicalHashtag" will not be added
+    tagExist = []
     environKeywords = os.environ['POLITICS_KEY_WORDS']
     keywords = environKeywords.split(',')
 
     for keyword in keywords:
         if keyword in json.dumps(updated_tweet):
-            updated_tweet['politicalHashtag'].append(keyword)
+            tagExist.append(keyword)
+
+    if len(tagExist) > 0:
+        updated_tweet['politicalHashtag'] = tagExist
+
 
 def identifyJunkFoodTweets(updated_tweet):
-    # identify whether there are policies keywords
-    updated_tweet['junkFoodList'] = []
+    # identify whether there are policies keywords, if not the "junkFoodList" will not be added
+    JFExist = []
     junkFoodFile = os.environ['JUNK_FOOD_KEY_WORDS_FILE']
 
     junkFoodItems = []
@@ -75,31 +79,18 @@ def identifyJunkFoodTweets(updated_tweet):
         junkFoodItems.append(line[:-1].lower())
     f.close()
 
-
     for keyword in junkFoodItems:
         if keyword in updated_tweet['text'].lower():
             updated_tweet['junkFoodList'].append(keyword)
-    print('Hey KAN! This the the junk food list: ',updated_tweet['junkFoodList'])  # for debugging
 
-
+    if len(JFExist) > 0:
+        updated_tweet['junkFoodList'] = JFExist
 
 def analysisSentiment(updated_tweet):
     # Utility function, TextBlob, to analysis sentiment of text
     sentiment = TextBlob(updated_tweet['text'])
     updated_tweet['sentiment'] = sentiment.sentiment.polarity
 
-def analysisSpelling(updated_tweet):
-    dic = enchant.Dict("en_US")
-    incorrect = 0
-    astr = json.dumps(updated_tweet["text"])
-    alist = str.split(" ")
-
-    for word in alist:
-        if not dic.check(word):
-            incorrect = incorrect + 1
-
-    rate = 1 - incorrect/len(alist)
-    updated_tweet["spellingrate"] = "{:.1%}".format(rate)
 
 def process(tweet_json, aus_polygon):
     # add process here
@@ -142,12 +133,10 @@ def do_consume(ch, method, properties, body):
     global updated_tweet
     updated_tweet = {}
 
+    # only keeps geo-tagged tweets
     if str(message["coordinates"]) != 'None':
         updated_tweet = process(message, aus_polygon)
         print('Hey Kan, updated tweet with coordinates is here: ',updated_tweet)  #for debugging
-    else:
-        updated_tweet['id'] = message['id']
-        print('Tweets has no coordinates: ',updated_tweet) #for debugging
 
     ch.basic_ack(delivery_tag=method.delivery_tag)
 
