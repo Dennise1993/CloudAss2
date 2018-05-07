@@ -36,58 +36,12 @@ const tweetsDesignDoc = {
     views: {
         countDivisibleTen: {
             map: `function (doc) {
-            if (doc.data % 10 === 0) {
+            if (doc.data && doc.data % 10 === 0) {
                 emit(doc._id, 1);
             }
         }`,
             reduce: '_count'
         }
-
-        // count by suburb
-        countBySuburb:{
-            map: `function (doc){
-                emit(doc.suburb,1);
-            }`,
-            reduce: '_sum'
-        }
-
-        // calculate the average by suburb
-        sentimentBySuburb:{
-            map:`function (doc){
-                emit(doc.suburb, sentiment)
-            }`,
-            reduce: '_stats' // average value can be calcualted via "Sum"/"Count"
-        }
-
-        // count the political-contained tweets by suburb
-        politicsBySuburb:{
-            map:`function (doc){
-                if(doc.politicalHashtag){
-                    emit(doc.suburb, 1)
-                }
-            }`
-            reduce: '_count'
-        }
-
-        // count the junk-food-contained tweets by suburb
-        junkFoodBySuburb:{
-            map:`function (doc){
-                if(doc.junkFoodList){
-                    emit(doc.suburb, 1)
-                }
-            }`
-            reduce: '_count'
-        }
-
-        // count by suburb and device (e.g. "Twitter for Web", "Twitter for Android")
-        deviceBySuburb:{
-            map:`function (doc){
-                emit([doc.suburb, doc.source],1)
-            }`
-            reduce: '_count'
-        }
-
-
     }
 };
 function doSetupDesignDocuments() {
@@ -120,7 +74,7 @@ function doSetupDesignDocuments() {
 
 // Functions to access the database
 function countDivisibleByTen(callback) {
-    db.view(tweetsDesignDocName + '/countDivisibleTen', {group: True}, function (err, res) {
+    db.view(tweetsDesignDocName + '/countDivisibleTen', function (err, res) {
         callback(err, res);
     });
 }

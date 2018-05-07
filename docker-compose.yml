@@ -1,26 +1,11 @@
 version: "3.6"
 
 services:
-  harvest_tweets_streaming:
-    build: ./harvest-tweets-streaming
-    image: 127.0.0.1:5000/harvest-tweets-streaming
-    networks:
-      - backend
-    depends_on:
-      - rabbitmq
-    environment:
-      - RABBITMQ_USER=rabbitmq
-      - RABBITMQ_PASS=jerseygrapefruitpetrolcalcium
-      - PYTHONUNBUFFERED=1
-      - CONSUMER_KEY=gHLBdGbr6BGAsORWeCUDnjVK8
-      - CONSUMER_SECRET=OhcP7O0AdfFAgLyb1KfNjg4KCQ90Pjh7zCGwnv1tAVvOUUaXQL
-      - ACCESS_TOKEN=775515873595359232-e5H9Fo5B4Kaz0i83L1oWIp86HuNWIf7
-      - ACCESS_TOKEN_SECRET=q16pw33BjTyfxrosoJiCycBqNm81el3ip2F9mU4oo5RDa
-      - COORDINATORS=[130.096982, -24.551835, 153.369916, -10.512868]
-
   harvest_tweets_search:
     build: ./harvest-tweets-search
     image: 127.0.0.1:5000/harvest-tweets-search
+    deploy:
+      replicas: 0
     networks:
       - backend
     depends_on:
@@ -29,10 +14,10 @@ services:
       - RABBITMQ_USER=rabbitmq
       - RABBITMQ_PASS=jerseygrapefruitpetrolcalcium
       - PYTHONUNBUFFERED=1
-      - CONSUMER_KEY=gHLBdGbr6BGAsORWeCUDnjVK8
-      - CONSUMER_SECRET=OhcP7O0AdfFAgLyb1KfNjg4KCQ90Pjh7zCGwnv1tAVvOUUaXQL
-      - ACCESS_TOKEN=775515873595359232-e5H9Fo5B4Kaz0i83L1oWIp86HuNWIf7
-      - ACCESS_TOKEN_SECRET=q16pw33BjTyfxrosoJiCycBqNm81el3ip2F9mU4oo5RDa
+      - CONSUMER_KEY=QUghEMjSjEkbbLZ60bYLtjlQc
+      - CONSUMER_SECRET=bGypwy7F5Da8fw1kA9QBUPzzEpjztQ2mJFAY7NOArb2wiDo9uc
+      - ACCESS_TOKEN=987599723237277697-pHEZCCEuDDCU7XGwLF0grzko3O5mBqt
+      - ACCESS_TOKEN_SECRET=s6KkDfT4o2W8yUKwMaGsnZRZSkESco1CIVUEvkneCTYO6
       - SEARCH_RANGE=-24.24,133.416667,1000km
 
   process_tweets:
@@ -49,9 +34,9 @@ services:
       - POLITICS_KEY_WORDS=#auspol,#LNP,#ALP,#Greens,#Labor,#Liberal,#Liberals,#Libs,#BillShorten,#Shorten,#MalcolmTurnbull,#Turnbull,#LNPfail
       - JUNK_FOOD_KEY_WORDS_FILE=junkfood.txt
 
-  remove_duplicate_tweets:
-    build: ./remove-duplicate-tweets
-    image: 127.0.0.1:5000/remove-duplicate-tweets
+  insert_database_tweets:
+    build: ./insert-database-tweets
+    image: 127.0.0.1:5000/insert-database-tweets
     networks:
       - backend
     depends_on:
@@ -81,7 +66,6 @@ services:
       replicas: 3
     networks:
       - backend
-      - frontend
     ports:
       - "3000:3000"
     environment:
