@@ -82,7 +82,7 @@ def identify_junk_food_tweets(updated_tweet):
 
     for keyword in junk_food_items:
         if keyword in updated_tweet['text'].lower():
-            updated_tweet['junkFoodList'].append(keyword)
+            found_junk_food.append(keyword)
 
     if len(found_junk_food) > 0:
         updated_tweet['junkFoodList'] = found_junk_food

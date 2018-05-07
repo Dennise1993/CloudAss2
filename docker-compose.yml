@@ -20,6 +20,23 @@ services:
       - ACCESS_TOKEN_SECRET=s6KkDfT4o2W8yUKwMaGsnZRZSkESco1CIVUEvkneCTYO6
       - SEARCH_RANGE=-24.24,133.416667,1000km
 
+  harvest_tweets_rich_urls:
+    build: ./harvest-tweets-rich-urls
+    image: 127.0.0.1:5000/harvest-tweets-rich-uls
+    deploy:
+      replicas: 0
+    networks:
+      - backend
+    depends_on:
+      - rabbitmq
+    environment:
+      - RABBITMQ_USER=rabbitmq
+      - RABBITMQ_PASS=jerseygrapefruitpetrolcalcium
+      - PYTHONUNBUFFERED=1
+      - HARVEST_LIMIT = 50
+
+
+
   process_tweets:
     build: ./process-tweets
     image: 127.0.0.1:5000/process-tweets
