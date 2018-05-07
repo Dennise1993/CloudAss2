@@ -3,10 +3,8 @@
 import logging
 import pika
 import json
-import tweepy
 import os
 import time
-from tweepy import OAuthHandler
 
 #logs for debegging
 logging.basicConfig(level=logging.DEBUG)
@@ -24,56 +22,36 @@ channel.queue_declare(queue=NEW_TWEET_QUEUE)
 logging.info(os.environ)
 
 
-#Load data from Rich's geo-tagged tweets files
-def loadRichFiles(path):
-    # path = '/Users/kan/Documents/Test/Files'
-    for fileName in os.listdir(path):
+#Load data from files
+cwd = os.getcwd()
+path = cwd + '/Files'
+print("Path:", path)
+for fileName in os.listdir(path):
     print('file name: ', fileName)
 
-    with open(path + '/'+fileName, 'r') as file:
-        lines = json.load(file)
+    try:
+        with open(os.path.join(path, fileName), 'r') as file:
+            try:
+                for line in file:
+                    try:
+                        tweet = json.loads(line)
+                        tweetStr = json.dumps(tweet)
+                        channel.basic_publish(
+                            exchange='',
+                            routing_key=NEW_TWEET_QUEUE,
+                            body=tweetStr)
+                        print("Tweet from:",fileName, "tweet is: ",tweetStr[:50])
+                    except:
+                        print("Hey Kan, error occurs here: ", fileName)
+                        continue
 
-        tweets = lines["rows"]
-
-        for tweetLine in tweets:
-            tweet = tweetLine['doc']
-            tweetStr = json.dumps(tweet)
-
-            channel.basic_publish(
-                    exchange='',
-                    routing_key=NEW_TWEET_QUEUE,
-                    body=tweetStr)
-
-
-def loadRichLink():
-    skip = 100
-    limit = 2
-
-    url = "http://45.113.232.90/couchdbro/twitter/_design/twitter/_view/geoindex?include_docs=true&reduce=false&skip="+str(skip)+"&limit="+str(limit)
-    r = requests.get(url,auth=("readonly","ween7ighai9gahR6"))
-
-    if r.status_code == requests.codes.ok:
-        dict = r.json()
-        tweets = dict["rows"]  # a list
-
-        for tweetLine in tweets:
-
-            tweet = tweetLine['doc']
-
-            print(json.dumps(tweet))
-            print("tweetLine[doc] class: ", tweetLine["doc"].__class__)
-
-            print(tweet["_id"])
+            except UnicodeDecodeError:
+                continue
 
 
-
-
-
-
-
-
-
-
+    except FileNotFoundError:
+        print("this file not found:", fileName)
+        continue
 
 
 # Disconnect RabbitMQ

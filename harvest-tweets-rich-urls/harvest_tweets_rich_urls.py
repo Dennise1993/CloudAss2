@@ -24,7 +24,7 @@ logging.info(os.environ)
 
 
 skip = 0
-limit = os.environ['HARVEST_LIMIT']
+limit = int(os.environ['HARVEST_LIMIT'])
 totalPosts = skip + limit
 
 
