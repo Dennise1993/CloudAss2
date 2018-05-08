@@ -21,6 +21,10 @@ def do_consume(ch, method, properties, body):
     message_id = message.pop(id)
     if message_id not in db:
         db[message_id] = message
+        logging.info(f'Added tweet {message_id} to the database.')
+    else:
+        logging.info(f'Tweet {message_id} is already in the database. '
+                     f'Skipping.')
     ch.basic_ack(delivery_tag=method.delivery_tag)
 
 
@@ -28,7 +32,8 @@ if __name__ == '__main__':
     # RabbitMQ Setup
     credentials = pika.PlainCredentials(os.environ['RABBITMQ_USER'],
                                         os.environ['RABBITMQ_PASS'])
-    parameters = pika.ConnectionParameters(host='rabbitmq', credentials=credentials)
+    parameters = pika.ConnectionParameters(host='rabbitmq',
+                                           credentials=credentials)
     connection = pika.BlockingConnection(parameters)
     channel = connection.channel()
 

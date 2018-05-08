@@ -9,7 +9,6 @@ from shapely.geometry import shape, Point
 from textblob import TextBlob
 import html2text
 
-
 TWEET_QUEUE = 'new_tweets'
 UPDATED_TWEET_QUEUE = 'updated_tweets'
 
@@ -82,7 +81,7 @@ def identify_junk_food_tweets(updated_tweet):
 
     for keyword in junk_food_items:
         if keyword in updated_tweet['text'].lower():
-            updated_tweet['junkFoodList'].append(keyword)
+            found_junk_food.append(keyword)
 
     if len(found_junk_food) > 0:
         updated_tweet['junkFoodList'] = found_junk_food
@@ -156,9 +155,9 @@ def do_consume(ch, method, properties, body):
 
         # Push the processed tweet to the processed message queue
         channel.basic_publish(
-               exchange='',
-               routing_key=UPDATED_TWEET_QUEUE,
-               body=json.dumps(updated_tweet),
+            exchange='',
+            routing_key=UPDATED_TWEET_QUEUE,
+            body=json.dumps(updated_tweet),
         )
     else:
         logging.info('No coordinate data. Skipping tweet: {}'

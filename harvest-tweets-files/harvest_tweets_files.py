@@ -3,78 +3,51 @@
 import logging
 import pika
 import json
-import tweepy
 import os
-import time
-from tweepy import OAuthHandler
 
-#logs for debegging
-logging.basicConfig(level=logging.DEBUG)
-
-# RabbitMQ server setup
-ruser = os.environ['RABBITMQ_USER']
-rpass = os.environ['RABBITMQ_PASS']
-credentials = pika.PlainCredentials(ruser, rpass)
-parameters = pika.ConnectionParameters(host='rabbitmq', credentials=credentials)
-connection = pika.BlockingConnection(parameters)
-channel = connection.channel()
 NEW_TWEET_QUEUE = 'new_tweets'
-channel.queue_declare(queue=NEW_TWEET_QUEUE)
 
-logging.info(os.environ)
+if __name__ == '__main__':
+    # Logs for debugging
+    logging.basicConfig(level=logging.DEBUG)
 
+    # RabbitMQ server setup
+    ruser = os.environ['RABBITMQ_USER']
+    rpass = os.environ['RABBITMQ_PASS']
+    credentials = pika.PlainCredentials(ruser, rpass)
+    parameters = pika.ConnectionParameters(host='rabbitmq',
+                                           credentials=credentials)
+    connection = pika.BlockingConnection(parameters)
+    channel = connection.channel()
+    channel.queue_declare(queue=NEW_TWEET_QUEUE)
 
-#Load data from Rich's geo-tagged tweets files
-def loadRichFiles(path):
-    # path = '/Users/kan/Documents/Test/Files'
-    for fileName in os.listdir(path):
-    print('file name: ', fileName)
+    # Load data from files
+    cwd = os.getcwd()
+    files_directory = cwd + '/Files'
 
-    with open(path + '/'+fileName, 'r') as file:
-        lines = json.load(file)
+    logging.debug(f'Files directory: {files_directory}')
 
-        tweets = lines["rows"]
+    for file_name in os.listdir(files_directory):
+        logging.info('Opened file: {file_name}')
 
-        for tweetLine in tweets:
-            tweet = tweetLine['doc']
-            tweetStr = json.dumps(tweet)
+        file_path = os.path.join(files_directory, file_name)
+        with open(file_path, 'r', encoding='utf-8') as file:
+            for line in file:
+                try:
+                    tweet = json.loads(line)
+                    message = json.dumps(tweet)
+                    channel.basic_publish(
+                        exchange='',
+                        routing_key=NEW_TWEET_QUEUE,
+                        body=message
+                    )
 
-            channel.basic_publish(
-                    exchange='',
-                    routing_key=NEW_TWEET_QUEUE,
-                    body=tweetStr)
+                    tweet_id = tweet['id_str']
+                    logging.info(f'Tweet published: {file_name}-{tweet_id}')
+                except json.JSONDecodeError as e:
+                    logging.exception(f'Failed to decode tweet: '
+                                      f'{file_name}-{tweet_id}')
+                    logging.exception(e)
 
-
-def loadRichLink():
-    skip = 100
-    limit = 2
-
-    url = "http://45.113.232.90/couchdbro/twitter/_design/twitter/_view/geoindex?include_docs=true&reduce=false&skip="+str(skip)+"&limit="+str(limit)
-    r = requests.get(url,auth=("readonly","ween7ighai9gahR6"))
-
-    if r.status_code == requests.codes.ok:
-        dict = r.json()
-        tweets = dict["rows"]  # a list
-
-        for tweetLine in tweets:
-
-            tweet = tweetLine['doc']
-
-            print(json.dumps(tweet))
-            print("tweetLine[doc] class: ", tweetLine["doc"].__class__)
-
-            print(tweet["_id"])
-
-
-
-
-
-
-
-
-
-
-
-
-# Disconnect RabbitMQ
-connection.close()
+    # Disconnect RabbitMQ
+    connection.close()
