@@ -38,7 +38,7 @@ services:
       - backend
     deploy:
       restart_policy:
-        on-failure
+        condition: on-failure
     depends_on:
       - rabbitmq
     environment:
@@ -54,7 +54,7 @@ services:
       - backend
     deploy:
       restart_policy:
-        on-failure
+        condition: on-failure
     environment:
       - RABBITMQ_USER=rabbitmq
       - RABBITMQ_PASS=jerseygrapefruitpetrolcalcium
