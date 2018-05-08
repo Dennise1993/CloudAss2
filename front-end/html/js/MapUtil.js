@@ -8,7 +8,7 @@ let topicData = {
 };
 */
 
-class MapUtils {
+class DiagramUtils {
   constructor ( mapLoc, keyLoc){
     this.mapFile = '../data/SA2_2016_AUST.json'; /* '../data/SA2_2016_AUST.json' */
     this.svgMap = d3.select(mapLoc); //'#myMap'
@@ -180,9 +180,12 @@ class MapUtils {
               return str;
             });         
       });
+  }
 
+  drawGraph(){
+    //this.topicData
   }
 
 };
 
-export default MapUtils;
+export default DiagramUtils;

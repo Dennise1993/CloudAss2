@@ -1,7 +1,7 @@
 import Base from './base.js';
 import TweetConfigAjax from './tweetConfigAjax.js';
 import BaseAjax from './baseAjax.js';
-import MapUtils from './MapUtil.js';
+import DiagramUtils from './MapUtil.js';
 
 class CloudApp extends BaseAjax(TweetConfigAjax(Base)){
 	constructor(){
@@ -28,7 +28,7 @@ class CloudApp extends BaseAjax(TweetConfigAjax(Base)){
 		};
 		this.areaTopic=['Melbourne', 'Sentiment', 'Age'];
 
-		this.mapUtils = new MapUtils('#myMap', '#myKey');
+		this.diagramUtils = new DiagramUtils('#myMap', '#myKey');
 		this.render();
 	}
 
@@ -57,12 +57,12 @@ class CloudApp extends BaseAjax(TweetConfigAjax(Base)){
 		let area = this.areaTopic[0];
 		let topic = this.areaTopic[1];
 		console.log('render map: area:'+ area+', topic: '+topic);
-		this.mapUtils.drawMapArea(topicData, topic, area);
+		this.diagramUtils.drawMapArea(topicData, topic, area);
 	}
 
 	renderGraph(){
 		this.graph.empty();
-
+		//show and hide stuff
 		console.log('render graph: '+ this.areaTopic[2]);
 	}
 
@@ -91,6 +91,7 @@ class CloudApp extends BaseAjax(TweetConfigAjax(Base)){
 			newContent = content.replace(/%data%/g,subTopics[i]);
 			this.subTopicArea.append(newContent);
 		}
+		/*
 
 		let topicData = {
 			'Greater Melbourne': {
@@ -111,8 +112,9 @@ class CloudApp extends BaseAjax(TweetConfigAjax(Base)){
 
 
 		this.renderMap(topicData);
+		*/
 		//REMOVE COMMENT AFTER API WORKS
-		/*
+		
 		let temUrl=null;
 		if(this.URLs.hasOwnProperty(topic)){
 			temUrl = window.location.href+this.URLs[topic];
@@ -120,7 +122,7 @@ class CloudApp extends BaseAjax(TweetConfigAjax(Base)){
 		if(temUrl){
 			this.callAjax(temUrl, this.renderMap, this.failCallBack);
 		} 
-		*/
+		
 		
 		this.renderGraph();
 	}
