@@ -18,7 +18,7 @@ def do_consume(ch, method, properties, body):
     logging.info(f'Consumed tweet: {message}')
 
     # Only save the tweet in the DB if we don't have it already
-    message_id = message.pop(id)
+    message_id = message.pop('id')
     if message_id not in db:
         db[message_id] = message
         logging.info(f'Added tweet {message_id} to the database.')
@@ -40,7 +40,7 @@ if __name__ == '__main__':
     channel.queue_declare(queue=UPDATED_TWEET_QUEUE)
 
     # CouchDB Setup
-    couch = couchdb.Server('http://127.0.0.1:5984/')
+    couch = couchdb.Server('http://couchdb:5984/')
     couch.resource.credentials = (os.environ['COUCHDB_USER'],
                                   os.environ['COUCHDB_PASSWORD'])
     if COUCHDB_TWEET_DATABASE in couch:

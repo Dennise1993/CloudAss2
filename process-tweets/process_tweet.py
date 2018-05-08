@@ -42,6 +42,9 @@ def select_attributes(updated_tweet, tweet_json):
     if 'quoted_status' in tweet_json:
         updated_tweet['quoted_status'] = tweet_json['quoted_status']
 
+    # Remove CouchDB ID if it exists
+    updated_tweet.pop('_id', None)
+
 
 def reverse_geo_location(updated_tweet, aus_polygon, aus_region):
     """Perform reverse geolocation on a given tweet to identify its suburb,
@@ -52,7 +55,6 @@ def reverse_geo_location(updated_tweet, aus_polygon, aus_region):
     for suburb, polygon in aus_polygon.items():
         if polygon.contains(point):
             updated_tweet["suburb"] = suburb
-            logging.info(f"Hey Kan, this is the suburb: {suburb}")
             break
 
     if "suburb" in updated_tweet:
@@ -61,7 +63,7 @@ def reverse_geo_location(updated_tweet, aus_polygon, aus_region):
                 updated_tweet["region"] = region
                 break
     else:
-        updated_tweet["suburb"] = "Not Found"
+        updated_tweet["suburb"] = None
 
 
 def identify_political_tweets(updated_tweet):
@@ -178,7 +180,7 @@ def do_consume(ch, method, properties, body):
             # Process the tweet
             updated_tweet = process(message, aus_polygon, aus_region)
             logging.info(f'Processed tweet: {updated_tweet}')
-            if updated_tweet["suburb"] != "Not Found":
+            if updated_tweet["suburb"] is not None:
                 # Push the processed tweet to the processed message queue
                 channel.basic_publish(
                     exchange='',
@@ -189,10 +191,11 @@ def do_consume(ch, method, properties, body):
             logging.info('No coordinate data. Skipping tweet: {}'
                          .format(message['id_str']))
 
-        ch.basic_ack(delivery_tag=method.delivery_tag)
     else:
         logging.info('Coordinate attribute does not exist. Skipping tweet: {}'
                      .format(message['id_str']))
+
+    ch.basic_ack(delivery_tag=method.delivery_tag)
 
 
 if __name__ == '__main__':

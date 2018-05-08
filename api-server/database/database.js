@@ -180,8 +180,8 @@ function mostPopularDeviceBySuburb(callback) {
                     if ((!(suburb in deviceCounts[region]) ||
                             count > deviceCounts[region][suburb]['count'])) {
                         deviceCounts[region][suburb] = {
-                            device: [device],
-                            count: [count]
+                            device: device,
+                            count: count
                         };
                     }
                 }

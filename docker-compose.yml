@@ -80,8 +80,8 @@ services:
     environment:
       - RABBITMQ_USER=rabbitmq
       - RABBITMQ_PASS=jerseygrapefruitpetrolcalcium
-      - COUCHDB_USER=admin
-      - COUCHDB_PASSWORD=admin
+      - COUCHDB_USER=couchdb
+      - COUCHDB_PASSWORD=crepesgiganticsuperfluousstranger
       - PYTHONUNBUFFERED=1
 
   rabbitmq:
@@ -107,8 +107,8 @@ services:
     environment:
       - DEBUG=*
       - NODE_ENV=production
-      - COUCHDB_USER=admin
-      - COUCHDB_PASSWORD=admin
+      - COUCHDB_USER=couchdb
+      - COUCHDB_PASSWORD=crepesgiganticsuperfluousstranger
 
   front_end:
     build: ./front-end

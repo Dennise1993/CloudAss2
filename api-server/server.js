@@ -29,7 +29,7 @@ app.get('/junk-food-ratio-suburb', function (req, res) {
     genericRequestHandler(req, res, db.junkFoodTweetRatioBySuburb);
 });
 
-const server = app.listen(3001, function () {
+const server = app.listen(3000, function () {
     const port = server.address().port;
     debug('API server listening at port %s', port);
 });
