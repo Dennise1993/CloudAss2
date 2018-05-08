@@ -30,7 +30,7 @@ def select_attributes(updated_tweet, tweet_json):
 
     # Get user info
     updated_tweet['user'] = {}
-    updated_tweet['user']['id'] = tweet_json['id_str']
+    updated_tweet['user']['id'] = tweet_json['user']['id_str']
     updated_tweet['user']['screen_name'] = tweet_json['user']['screen_name']
     updated_tweet['user']['geo_enabled'] = tweet_json['user']['geo_enabled']
 
@@ -42,8 +42,11 @@ def select_attributes(updated_tweet, tweet_json):
     if 'quoted_status' in tweet_json:
         updated_tweet['quoted_status'] = tweet_json['quoted_status']
 
+    # Remove CouchDB ID if it exists
+    updated_tweet.pop('_id', None)
 
-def reverse_geo_location(updated_tweet, aus_polygon):
+
+def reverse_geo_location(updated_tweet, aus_polygon, aus_region):
     """Perform reverse geolocation on a given tweet to identify its suburb,
     and insert it into the tweet.
     """
@@ -53,6 +56,14 @@ def reverse_geo_location(updated_tweet, aus_polygon):
         if polygon.contains(point):
             updated_tweet["suburb"] = suburb
             break
+
+    if "suburb" in updated_tweet:
+        for suburb, region in aus_region.items():
+            if suburb == updated_tweet["suburb"]:
+                updated_tweet["region"] = region
+                break
+    else:
+        updated_tweet["suburb"] = None
 
 
 def identify_political_tweets(updated_tweet):
@@ -93,7 +104,7 @@ def analysis_sentiment(updated_tweet):
     updated_tweet['sentiment'] = sentiment.sentiment.polarity
 
 
-def process(tweet_json, aus_polygon):
+def process(tweet_json, aus_polygon, aus_region):
     """Process and analyse a tweet from Twitter."""
 
     updated_tweet = {}
@@ -101,8 +112,8 @@ def process(tweet_json, aus_polygon):
     # Grab the tweet attributes that we want
     select_attributes(updated_tweet, tweet_json)
 
-    # Determine the suburb for which the tweet was sent in
-    reverse_geo_location(updated_tweet, aus_polygon)
+    # Determine the suburb and region for which the tweet was sent in
+    reverse_geo_location(updated_tweet, aus_polygon, aus_region)
 
     # Identify whether the tweet is political
     identify_political_tweets(updated_tweet)
@@ -117,7 +128,7 @@ def process(tweet_json, aus_polygon):
 
 
 @lru_cache(maxsize=None)
-def read_map(map_file_name):
+def read_suburb_map(map_file_name):
     """Read in the geographic regions for each suburb."""
     aus_polygon = {}
     # TODO - check all these != 'None'
@@ -130,6 +141,20 @@ def read_map(map_file_name):
                 aus_polygon[suburb] = polygon
 
     return aus_polygon
+
+@lru_cache(maxsize=None)
+def read_region_map(map_file_name):
+    """Read in the geographic regions for each suburb."""
+    aus_region = {}
+    with open(map_file_name) as file:
+        file_data = json.load(file)
+        for feature in file_data["features"]:
+            if feature['geometry'] is not None:
+                region = feature["properties"]["GCC_NAME16"]
+                suburb = feature["properties"]["SA2_NAME16"]
+                aus_region[suburb] = region
+
+    return aus_region
 
 
 @lru_cache(maxsize=None)
@@ -145,22 +170,29 @@ def read_junk_food_items(junk_food_file_name):
 
 def do_consume(ch, method, properties, body):
     message = json.loads(body)
-    aus_polygon = read_map("./SA2_2016_AUST (2).json")
+    aus_polygon = read_suburb_map("./SA2_2016_AUST (2).json")
+    aus_region = read_region_map("./SA2_2016_AUST (2).json")
 
     # We only want tweets with geospatial coordinates
-    if message['coordinates'] is not None:
-        logging.info(f'Processing tweet: {message}')
-        # Process the tweet
-        updated_tweet = process(message, aus_polygon)
+    if 'coordinates' in message:
+        if message['coordinates'] is not None:
+            logging.info(f'Processing tweet: {message}')
+            # Process the tweet
+            updated_tweet = process(message, aus_polygon, aus_region)
+            logging.info(f'Processed tweet: {updated_tweet}')
+            if updated_tweet["suburb"] is not None:
+                # Push the processed tweet to the processed message queue
+                channel.basic_publish(
+                    exchange='',
+                    routing_key=UPDATED_TWEET_QUEUE,
+                    body=json.dumps(updated_tweet),
+                )
+        else:
+            logging.info('No coordinate data. Skipping tweet: {}'
+                         .format(message['id_str']))
 
-        # Push the processed tweet to the processed message queue
-        channel.basic_publish(
-            exchange='',
-            routing_key=UPDATED_TWEET_QUEUE,
-            body=json.dumps(updated_tweet),
-        )
     else:
-        logging.info('No coordinate data. Skipping tweet: {}'
+        logging.info('Coordinate attribute does not exist. Skipping tweet: {}'
                      .format(message['id_str']))
 
     ch.basic_ack(delivery_tag=method.delivery_tag)

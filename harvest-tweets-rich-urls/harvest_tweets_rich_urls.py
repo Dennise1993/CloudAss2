@@ -24,13 +24,16 @@ channel.queue_declare(queue=NEW_TWEET_QUEUE)
 
 # Tweet retrieval settings
 skip = 0
-limit = int(os.environ['HARVEST_LIMIT'])
+print('os.environ: ', os.environ['HARVEST_LIMIT'])
+limitStr = os.environ['HARVEST_LIMIT']
+limit = int(limitStr)
 total_posts = skip + limit
 
 while (skip + limit) <= total_posts:
+    skipStr = str(skip)
     url = (f'http://45.113.232.90/couchdbro/twitter/_design/twitter/_view/'
            f'geoindex?include_docs=true&reduce=false&'
-           f'skip={skip}&limit={limit}')
+           f'skip={skipStr}&limit={limitStr}')
     r = requests.get(url, auth=("readonly", "ween7ighai9gahR6"))
     if r.status_code == requests.codes.ok:
         all_tweets_dict = r.json()
@@ -48,6 +51,7 @@ while (skip + limit) <= total_posts:
                 routing_key=NEW_TWEET_QUEUE,
                 body=message
             )
+            logging.info(f'Tweet published:{tweet}')
             print(tweet["_id"])
         skip = skip + limit
     time.sleep(5)
