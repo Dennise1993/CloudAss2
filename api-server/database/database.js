@@ -32,18 +32,76 @@ db.exists(function (err, exists) {
 // Helpers for setting up the design documents
 const tweetsDesignDocName = 'tweets';
 const tweetsDesignDocLocation = '_design/' + tweetsDesignDocName;
+
+// Used for calculating the average when reducing through MapReduce
+// Source for calculating the average:
+//      http://tobyho.com/2009/10/07/taking-an-average-in-couchdb/
+const averageReduceFunction = `function (keys, values, rereduce) {
+    if (!rereduce) {
+        var length = values.length;
+        return [sum(values) / length, length];
+    } else {
+        var length = sum(values.map(function (v) {
+            return v[1];
+        }));
+        var avg = sum(values.map(function (v) {
+            return v[0] * (v[1] / length);
+        }));
+        return [avg, length];
+    }
+}`;
+
 const tweetsDesignDoc = {
     views: {
-        countDivisibleTen: {
+        politicalRatioBySuburb: {
             map: `function (doc) {
-            if (doc.data && doc.data % 10 === 0) {
-                emit(doc._id, 1);
-            }
-        }`,
+                if (doc.region && (doc.region === 'Greater Melbourne' ||
+                        doc.region === 'Greater Sydney')) {
+                    if (doc.politicalHashtag) {
+                        emit([doc.region, doc.suburb], 1);
+                    } else {
+                        emit([doc.region, doc.suburb], 0);
+                    }
+                }
+            }`,
+            reduce: averageReduceFunction
+        },
+        sentimentBySuburb: {
+            map: `function (doc) {
+                if (doc.sentiment && doc.region &&
+                    (doc.region === 'Greater Melbourne' ||
+                        doc.region === 'Greater Sydney')) {
+                    emit([doc.region, doc.suburb], doc.sentiment);
+                }
+            }`,
+            reduce: averageReduceFunction
+        },
+        mostPopularDeviceBySuburb: {
+            map: `function (doc) {
+                if (doc.source && doc.region &&
+                    (doc.region === 'Greater Melbourne' ||
+                        doc.region === 'Greater Sydney')) {
+                    emit([doc.region, doc.suburb, doc.source], 1);
+                }
+            }`,
             reduce: '_count'
+        },
+        junkFoodRatioBySuburb: {
+            map: `function (doc) {
+                if (doc.region && (doc.region === 'Greater Melbourne' ||
+                        doc.region === 'Greater Sydney')) {
+                    if (doc.junkFoodList) {
+                        emit([doc.region, doc.suburb], 1);
+                    } else {
+                        emit([doc.region, doc.suburb], 0);
+                    }
+                }
+            }`,
+            reduce: averageReduceFunction
         }
     }
 };
+
 function doSetupDesignDocuments() {
     db.get(tweetsDesignDocLocation, function (err, doc) {
         if (err && err.error !== 'not_found') {
@@ -72,13 +130,87 @@ function doSetupDesignDocuments() {
     });
 }
 
-// Functions to access the database
-function countDivisibleByTen(callback) {
-    db.view(tweetsDesignDocName + '/countDivisibleTen', function (err, res) {
+// Used to collate results from the database in the form of:
+//     [region, suburb]: [average, total_items]
+function mergeRegionSuburbAverageResults(err, res, callback) {
+    if (!err) {
+        const results = {};
+        for (let subResponse of res) {
+            const region = subResponse['key'][0];
+            const suburb = subResponse['key'][1];
+            const avg = subResponse['value'][0];
+
+            results[region] = results[region] || {};
+            results[region][suburb] = avg;
+        }
+        callback(err, results);
+    } else {
         callback(err, res);
-    });
+    }
+}
+
+// Functions to access the database
+function politicalTweetRatioBySuburb(callback) {
+    db.view(tweetsDesignDocName + '/politicalRatioBySuburb', {group: true},
+        function (err, res) {
+            mergeRegionSuburbAverageResults(err, res, callback)
+        });
+}
+
+function sentimentBySuburb(callback) {
+    db.view(tweetsDesignDocName + '/sentimentBySuburb', {group: true},
+        function (err, res) {
+            mergeRegionSuburbAverageResults(err, res, callback)
+        });
+}
+
+function mostPopularDeviceBySuburb(callback) {
+    db.view(tweetsDesignDocName + '/mostPopularDeviceBySuburb', {group: true},
+        function (err, res) {
+            if (!err) {
+                // Determine the device with the most frequency
+                const deviceCounts = {};
+                for (let subResponse of res) {
+                    const region = subResponse['key'][0];
+                    const suburb = subResponse['key'][1];
+                    const device = subResponse['key'][2];
+                    const count = subResponse['value'];
+
+                    deviceCounts[region] = deviceCounts[region] || {};
+                    if ((!(suburb in deviceCounts[region]) ||
+                            count > deviceCounts[region][suburb]['count'])) {
+                        deviceCounts[region][suburb] = {
+                            device: [device],
+                            count: [count]
+                        };
+                    }
+                }
+
+                // Remove the count field from our results
+                let results = {};
+                for (const [region, regionDict] of Object.entries(deviceCounts)) {
+                    for (const [suburb, suburbDict] of Object.entries(regionDict)) {
+                        results[region] = results[region] || {};
+                        results[region][suburb] = suburbDict['device'];
+                    }
+                }
+                callback(err, results);
+            } else {
+                callback(err, res);
+            }
+        });
+}
+
+function junkFoodTweetRatioBySuburb(callback) {
+    db.view(tweetsDesignDocName + '/junkFoodRatioBySuburb', {group: true},
+        function (err, res) {
+            mergeRegionSuburbAverageResults(err, res, callback)
+        });
 }
 
 module.exports = {
-    countDivisibleByTen,
+    politicalTweetRatioBySuburb,
+    sentimentBySuburb,
+    mostPopularDeviceBySuburb,
+    junkFoodTweetRatioBySuburb,
 };
