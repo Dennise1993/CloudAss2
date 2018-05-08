@@ -9,7 +9,6 @@ from shapely.geometry import shape, Point
 from textblob import TextBlob
 import html2text
 
-
 TWEET_QUEUE = 'new_tweets'
 UPDATED_TWEET_QUEUE = 'updated_tweets'
 
@@ -156,9 +155,9 @@ def do_consume(ch, method, properties, body):
 
         # Push the processed tweet to the processed message queue
         channel.basic_publish(
-               exchange='',
-               routing_key=UPDATED_TWEET_QUEUE,
-               body=json.dumps(updated_tweet),
+            exchange='',
+            routing_key=UPDATED_TWEET_QUEUE,
+            body=json.dumps(updated_tweet),
         )
     else:
         logging.info('No coordinate data. Skipping tweet: {}'
