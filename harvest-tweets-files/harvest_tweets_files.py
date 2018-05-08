@@ -28,26 +28,37 @@ if __name__ == '__main__':
     logging.debug(f'Files directory: {files_directory}')
 
     for file_name in os.listdir(files_directory):
-        logging.info('Opened file: {file_name}')
+        logging.info(f'Opened file: {file_name}')
 
         file_path = os.path.join(files_directory, file_name)
         with open(file_path, 'r', encoding='utf-8') as file:
-            for line in file:
-                try:
-                    tweet = json.loads(line)
-                    message = json.dumps(tweet)
-                    channel.basic_publish(
-                        exchange='',
-                        routing_key=NEW_TWEET_QUEUE,
-                        body=message
-                    )
+            try:
+                for line in file:
+                    try:
+                        tweet = json.loads(line)
+                        message = json.dumps(tweet)
+                        channel.basic_publish(
+                            exchange='',
+                            routing_key=NEW_TWEET_QUEUE,
+                            body=message
+                        )
 
-                    tweet_id = tweet['id_str']
-                    logging.info(f'Tweet published: {file_name}-{tweet_id}')
-                except json.JSONDecodeError as e:
-                    logging.exception(f'Failed to decode tweet: '
-                                      f'{file_name}-{tweet_id}')
-                    logging.exception(e)
+                        tweet_id = tweet['id_str']
+                        logging.info(f'Tweet published: {file_name}-{tweet_id}')
+                    except Exception as e:
+                        logging.exception(f'Failed to decode tweet: '
+                                          f'{file_name}-{tweet_id}')
+                        logging.exception(e)
+                        logging.info(f'ERROR in json.loads(): {line}')
+                        continue
+
+            except UnicodeDecodeError as e:
+                logging.exception(f'Failed to decode a line: '
+                                  f'{line}')
+                logging.exception(e)
+                logging.info(f'ERROR in read a line in file: {line}')
+                continue
+
 
     # Disconnect RabbitMQ
     connection.close()
