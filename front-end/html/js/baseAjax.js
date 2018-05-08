@@ -11,14 +11,10 @@ let BaseAjax = (supperclass) => class extends supperclass {
 
     callAjax(urlAddr, successCallBack, failCallBack) {
         this._getCall(urlAddr)
-            .done(function (d) {
-                if (d.status === "success") {
-                    successCallBack(d.result);
-                    console.log("call " + urlAddr+ " successful.");
-                } else {
-                    cosole.log(d);
-                    failCallBack();
-                }
+            .done(function (d) {              
+                successCallBack(d);
+                console.log("call " + urlAddr+ " successful.");
+                
             })
             .fail(function (e) {
                 console.log(e);

@@ -1,6 +1,7 @@
 import Base from './base.js';
 import TweetConfigAjax from './tweetConfigAjax.js';
 import BaseAjax from './baseAjax.js';
+import MapUtils from './MapUtil.js';
 
 class CloudApp extends BaseAjax(TweetConfigAjax(Base)){
 	constructor(){
@@ -27,6 +28,7 @@ class CloudApp extends BaseAjax(TweetConfigAjax(Base)){
 		};
 		this.areaTopic=['Melbourne', 'Sentiment', 'Age'];
 
+		this.mapUtils = new MapUtils('#myMap', '#myKey');
 		this.render();
 	}
 
@@ -48,16 +50,21 @@ class CloudApp extends BaseAjax(TweetConfigAjax(Base)){
 		}
 	}
 
-	renderMap(){
+	renderMap(topicData){
+		this.map.empty();
+		this.sclaeLine.empty();
+
 		let area = this.areaTopic[0];
 		let topic = this.areaTopic[1];
 		console.log('render map: area:'+ area+', topic: '+topic);
-		//
-	}
-	renderGraph(){
-		console.log('render graph: '+ this.areaTopic[2]);
+		this.mapUtils.drawMapArea(topicData, topic, area);
 	}
 
+	renderGraph(){
+		this.graph.empty();
+
+		console.log('render graph: '+ this.areaTopic[2]);
+	}
 
 	loadGraph(e){
 		let subTopic = $(e.target).data('subTopic');
@@ -84,9 +91,42 @@ class CloudApp extends BaseAjax(TweetConfigAjax(Base)){
 			newContent = content.replace(/%data%/g,subTopics[i]);
 			this.subTopicArea.append(newContent);
 		}
-		//TODO:render map and graphs
-		this.renderMap();
+
+		let topicData = {
+			'Greater Melbourne': {
+				'Docklands': 0.1,
+				'Melbourne': 0.14,
+				'Carlton': 0.19,
+				'Altona North': 0.08,
+				'Brunswick': 0.2				
+			},
+			'Greater Sydney': {
+				'Mosman': 0.05,
+				'Homebush': 0.9,
+				'Maroubra': 0.17,
+				'Marrickville': 0.11
+			}
+
+		};
+
+
+		this.renderMap(topicData);
+		//REMOVE COMMENT AFTER API WORKS
+		/*
+		let temUrl=null;
+		if(this.URLs.hasOwnProperty(topic)){
+			temUrl = window.location.href+this.URLs[topic];
+		}
+		if(temUrl){
+			this.callAjax(temUrl, this.renderMap, this.failCallBack);
+		} 
+		*/
+		
 		this.renderGraph();
+	}
+
+	failCallBack(){
+		alert('Something wrong, please try again.');
 	}
 }
 
@@ -94,9 +134,11 @@ CloudApp.eles = {
 	body: 'body',
 	title: '.js-title',
 	map: '.js-map',
+	sclaeLine: '.js-key',
 	graphContent: '#js-graph-content',
 	subTopicArea: '.js-sub-topic',
-	subTab: '.js-sub-tab'
+	subTab: '.js-sub-tab',
+	graph: 'js-graph'
 };
 CloudApp.eventMap = {
 	"click .js-area a": "loadArea",
