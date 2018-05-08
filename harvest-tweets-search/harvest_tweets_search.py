@@ -40,7 +40,9 @@ if __name__ == '__main__':
         status = api.search(
             geocode=os.environ['SEARCH_RANGE'],
             since_id=next_search_id,
-            rpp=100
+            monitor_rate_limit=True,
+            wait_on_rate_limit=True,
+            rpp=99
         )
 
         for item in status.get('statuses'):

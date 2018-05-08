@@ -5,21 +5,28 @@ const db = require('./database/database');
 const express = require('express');
 const app = express();
 
-app.get('/count-divisible-ten', function (req, res) {
-    db.countDivisibleByTen(function(err, response) {
+function genericRequestHandler(req, res, getResponse) {
+    getResponse(function (err, response) {
         if (err) {
             debug('error', err);
             res.sendStatus(500);
         } else {
-            let count;
-            if (response.length > 0) {
-                count = response[0].value;
-            } else {
-                count = 0;
-            }
-            res.status(200).send({'count': count});
+            res.status(200).send(response);
         }
     });
+}
+
+app.get('/political-ratio-suburb', function (req, res) {
+    genericRequestHandler(req, res, db.politicalTweetRatioBySuburb);
+});
+app.get('/sentiment-suburb', function (req, res) {
+    genericRequestHandler(req, res, db.sentimentBySuburb);
+});
+app.get('/popular-device-suburb', function (req, res) {
+    genericRequestHandler(req, res, db.mostPopularDeviceBySuburb);
+});
+app.get('/junk-food-ratio-suburb', function (req, res) {
+    genericRequestHandler(req, res, db.junkFoodTweetRatioBySuburb);
 });
 
 const server = app.listen(3000, function () {
