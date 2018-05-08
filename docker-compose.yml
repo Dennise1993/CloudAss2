@@ -1,49 +1,41 @@
 version: "3.6"
 
 services:
+  harvest_tweets_streaming:
+    build: ./harvest-tweets-streaming
+    image: 127.0.0.1:5000/harvest-tweets-streaming
+    depends_on:
+      - rabbitmq
+    environment:
+      - RABBITMQ_USER=rabbitmq
+      - RABBITMQ_PASS=jerseygrapefruitpetrolcalcium
+      - PYTHONUNBUFFERED=1
+      - CONSUMER_KEY=gHLBdGbr6BGAsORWeCUDnjVK8
+      - CONSUMER_SECRET=OhcP7O0AdfFAgLyb1KfNjg4KCQ90Pjh7zCGwnv1tAVvOUUaXQL
+      - ACCESS_TOKEN=775515873595359232-e5H9Fo5B4Kaz0i83L1oWIp86HuNWIf7
+      - ACCESS_TOKEN_SECRET=q16pw33BjTyfxrosoJiCycBqNm81el3ip2F9mU4oo5RDa
+      - COORDINATORS=[130.096982, -24.551835, 153.369916, -10.512868]
+
+
   harvest_tweets_search:
     build: ./harvest-tweets-search
     image: 127.0.0.1:5000/harvest-tweets-search
-    deploy:
-      replicas: 0
-    networks:
-      - backend
     depends_on:
       - rabbitmq
     environment:
       - RABBITMQ_USER=rabbitmq
       - RABBITMQ_PASS=jerseygrapefruitpetrolcalcium
       - PYTHONUNBUFFERED=1
-      - CONSUMER_KEY=QUghEMjSjEkbbLZ60bYLtjlQc
-      - CONSUMER_SECRET=bGypwy7F5Da8fw1kA9QBUPzzEpjztQ2mJFAY7NOArb2wiDo9uc
-      - ACCESS_TOKEN=987599723237277697-pHEZCCEuDDCU7XGwLF0grzko3O5mBqt
-      - ACCESS_TOKEN_SECRET=s6KkDfT4o2W8yUKwMaGsnZRZSkESco1CIVUEvkneCTYO6
+      - CONSUMER_KEY=gHLBdGbr6BGAsORWeCUDnjVK8
+      - CONSUMER_SECRET=OhcP7O0AdfFAgLyb1KfNjg4KCQ90Pjh7zCGwnv1tAVvOUUaXQL
+      - ACCESS_TOKEN=775515873595359232-e5H9Fo5B4Kaz0i83L1oWIp86HuNWIf7
+      - ACCESS_TOKEN_SECRET=q16pw33BjTyfxrosoJiCycBqNm81el3ip2F9mU4oo5RDa
       - SEARCH_RANGE=-24.24,133.416667,1000km
 
-  harvest_tweets_files:
-    build: ./harvest-tweets-files
-    image: 127.0.0.1:5000/harvest-tweets-files
-    deploy:
-      restart_policy:
-        condition: on-failure
-    networks:
-      - backend
-    depends_on:
-      - rabbitmq
-    environment:
-      - RABBITMQ_USER=rabbitmq
-      - RABBITMQ_PASS=jerseygrapefruitpetrolcalcium
-      - PYTHONUNBUFFERED=1
 
   harvest_tweets_rich_urls:
     build: ./harvest-tweets-rich-urls
     image: 127.0.0.1:5000/harvest-tweets-rich-uls
-    deploy:
-      replicas: 0
-      restart_policy:
-        condition: on-failure
-    networks:
-      - backend
     depends_on:
       - rabbitmq
     environment:
@@ -52,11 +44,21 @@ services:
       - PYTHONUNBUFFERED=1
       - HARVEST_LIMIT=50
 
+
+  harvest_tweets_files:
+    build: ./harvest-tweets-files
+    image: 127.0.0.1:5000/harvest-tweets-files
+    depends_on:
+      - rabbitmq
+    environment:
+      - RABBITMQ_USER=rabbitmq
+      - RABBITMQ_PASS=jerseygrapefruitpetrolcalcium
+      - PYTHONUNBUFFERED=1
+
+
   process_tweets:
     build: ./process-tweets
     image: 127.0.0.1:5000/process-tweets
-    networks:
-      - backend
     depends_on:
       - rabbitmq
     environment:
@@ -66,11 +68,10 @@ services:
       - POLITICS_KEY_WORDS=#auspol,#LNP,#ALP,#Greens,#Labor,#Liberal,#Liberals,#Libs,#BillShorten,#Shorten,#MalcolmTurnbull,#Turnbull,#LNPfail
       - JUNK_FOOD_KEY_WORDS_FILE=junkfood.txt
 
+
   insert_database_tweets:
     build: ./insert-database-tweets
     image: 127.0.0.1:5000/insert-database-tweets
-    networks:
-      - backend
     depends_on:
       - rabbitmq
     environment:
@@ -80,44 +81,12 @@ services:
       - COUCHDB_PASSWORD=admin
       - PYTHONUNBUFFERED=1
 
+
   rabbitmq:
     image: 127.0.0.1:5000/rabbitmq:3-management-alpine
-    networks:
-      - backend
     ports:
       - "15672:15672"
     environment:
       - RABBITMQ_ERLANG_COOKIE=QYJHJRUWSOCYIBEGEQJI
       - RABBITMQ_DEFAULT_USER=rabbitmq
       - RABBITMQ_DEFAULT_PASS=jerseygrapefruitpetrolcalcium
-
-  api_server:
-    build: ./api-server
-    image: 127.0.0.1:5000/api-server
-    deploy:
-      replicas: 3
-    networks:
-      - backend
-    ports:
-      - "3000:3000"
-    environment:
-      - DEBUG=*
-      - NODE_ENV=production
-      - COUCHDB_USER=admin
-      - COUCHDB_PASSWORD=admin
-
-  front_end:
-    build: ./front-end
-    image: 127.0.0.1:5000/front-end
-    deploy:
-      replicas: 3
-    networks:
-      - frontend
-    ports:
-      - "80:80"
-
-networks:
-  backend:
-    external: true
-  frontend:
-    driver: overlay

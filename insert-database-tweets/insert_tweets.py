@@ -40,7 +40,7 @@ if __name__ == '__main__':
     channel.queue_declare(queue=UPDATED_TWEET_QUEUE)
 
     # CouchDB Setup
-    couch = couchdb.Server('http://couchdb:5984/')
+    couch = couchdb.Server('http://127.0.0.1:5984/')
     couch.resource.credentials = (os.environ['COUCHDB_USER'],
                                   os.environ['COUCHDB_PASSWORD'])
     if COUCHDB_TWEET_DATABASE in couch:
