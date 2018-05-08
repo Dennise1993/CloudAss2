@@ -62,7 +62,6 @@ def reverse_geo_location(updated_tweet, aus_polygon, aus_region):
                 break
     else:
         updated_tweet["suburb"] = "Not Found"
-        logging.info(f"Hey Kan, the tweet {updated_tweet['id']} is not in targed suburb")
 
 
 def identify_political_tweets(updated_tweet):
@@ -145,11 +144,10 @@ def read_suburb_map(map_file_name):
 def read_region_map(map_file_name):
     """Read in the geographic regions for each suburb."""
     aus_region = {}
-    # TODO - check all these != 'None'
     with open(map_file_name) as file:
         file_data = json.load(file)
         for feature in file_data["features"]:
-            if str(feature['geometry']) != 'None':
+            if feature['geometry'] is not None:
                 region = feature["properties"]["GCC_NAME16"]
                 suburb = feature["properties"]["SA2_NAME16"]
                 aus_region[suburb] = region
