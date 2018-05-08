@@ -21,18 +21,13 @@
             </h6>
             <ul class="nav flex-column js-area">
               <li class="nav-item">
-                <a class="nav-link" href="#" data-area="Australia">
-                  Australia
-                </a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="#" data-area="Sydney">
-                  Sydney
-                </a>
-              </li>
-              <li class="nav-item">
                 <a class="nav-link" href="#" data-area="Melbourne">
                   Melbourne
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#" data-area="Sydeny">
+                  Sydeny
                 </a>
               </li>
             </ul>
@@ -41,34 +36,27 @@
               <span>Topics</span>
               </a>
             </h6>
-	            <ul class="nav flex-column mb-2 js-topic">
-	              <li class="nav-item">
-	                <a class="nav-link" href="#" data-topic="Number of Tweets">
-	                  Number of Tweets
-	                </a>
-	              </li>
-	            	<div id="other-topics">
-						<li class="nav-item">
-							<a class="nav-link" href="#" data-topic="Politics">
-							  Politics
-							</a>
-						</li>
-						<li class="nav-item">
-							<a class="nav-link" href="#" data-topic="Sentiment">
-							  Sentiment
-							</a>
-						</li>
-						<li class="nav-item">
-							<a class="nav-link" href="#" data-topic="Device">
-							  Device
-							</a>
-						</li>	
-						<li class="nav-item">
-							<a class="nav-link" href="#" data-topic="Junk Food">
-							  Junk Food
-							</a>
-						</li>            		
-	            	</div>
+	            <ul class="nav flex-column mb-2 js-topic">  
+	            	<li class="nav-item">
+						<a class="nav-link" href="#" data-topic="Sentiment">
+						  Sentiment
+						</a>
+					</li>          	
+					<li class="nav-item">
+						<a class="nav-link" href="#" data-topic="Politics">
+						  Politics
+						</a>
+					</li>	
+					<li class="nav-item">
+						<a class="nav-link" href="#" data-topic="Junk Food">
+						  Junk Food
+						</a>
+					</li> 
+					<li class="nav-item">
+						<a class="nav-link" href="#" data-topic="Device">
+						  Device
+						</a>
+					</li>           		            
 	            </ul>            	
           </div>
         </nav>
@@ -76,7 +64,7 @@
         	<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
         		<h1 class="h2 js-title"></h1>
         	</div>
-          <svg class="my-4 w-100 js-map" id="myMap" width="900" height="380"></svg>
+          <svg class="my-4 w-100 js-map" id="myMap" width="900" height="700"></svg>
 			<div id="js-graph-content">
 	          <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
 	          	
@@ -84,10 +72,9 @@
 	            <div id="aurin-topics">
 		            <div class="btn-toolbar mb-2 mb-md-0">
 		              <div class="btn-group mr-2 js-sub-topic">
-		                <button class="btn btn-sm btn-outline-secondary">Age</button>
-		                <button class="btn btn-sm btn-outline-secondary">Education</button>
-		                <button class="btn btn-sm btn-outline-secondary">Income</button>
-		                <button class="btn btn-sm btn-outline-secondary">Health</button>
+		              	<script type="text/template" class='js-sub-tab'>
+		              		<button class="btn btn-sm btn-outline-secondary" data-sub-topic='%data%'>%data%</button>
+		              	</script>		                
 		              </div>
 		            </div>            	
 	            </div>
@@ -109,9 +96,12 @@
 
 	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
 
-	<script src="https://d3js.org/d3.v5.min.js"></script>
+	<script src="https://d3js.org/d3.v4.min.js"></script>
+	<script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+	<script src="https://d3js.org/topojson.v2.min.js"></script>
 
 	<script src="js/cloudIndex.js" type="module"></script>
+	<script type="text/javascript" src="js/boardApp.js"></script>
 </body>
 
 </html>

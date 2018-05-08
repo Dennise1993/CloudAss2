@@ -4,24 +4,10 @@ let TweetConfigAjax = (supperclass) => class extends supperclass {
         super();
         console.log('tweet config constrctor');
         this.URLs = {
-            'Australia': 
-                {
-                    'Number of Tweets': ''
-                },
-            'Melbourne': 
-                {
-                    'Politics': '',
-                    'Sentiment': '',
-                    'Spelling': '',
-                    'Number of Tweets': ''
-                },
-            'Sydney':
-                {
-                    'Politics': '',
-                    'Sentiment': '',
-                    'Spelling': '',
-                    'Number of Tweets': ''
-                }
+            'Politics': '',
+            'Sentiment': '',
+            'Junk Food': '',
+            'Device': ''               
         };
     }
 };

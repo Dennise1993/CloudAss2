@@ -11,20 +11,28 @@ class CloudApp extends BaseAjax(TweetConfigAjax(Base)){
 		this.initializeElements();
         this.bindEvents();
 
-		this.areaTopic=['Australia', 'Number of Tweets'];
+		this.areaTopicMap = {
+			'Melbourne':{
+				'Sentiment':['Age','Education','Income'],
+				'Politics':['Age','Education','Income'],
+				'Junk Food':['Age','Income','Health'],
+				'Device':['Age','Income']
+			},
+			'Sydeny':{
+				'Sentiment':['Age','Education','Income'],
+				'Politics':['Age','Education','Income'],
+				'Junk Food':['Age','Income','Health'],
+				'Device':['Age','Income']
+			}
+		};
+		this.areaTopic=['Melbourne', 'Sentiment', 'Age'];
 
 		this.render();
 	}
 
 	loadTopic(e){
-		//build a new array then fill area and topic
-		//compare if two arrays are same
-			//if not then call api
-			//if not change the title
-			//if not then check area is australia or not
-				//if not, show '#other-topics'
-				//if yes, hide '#other topics'
 		let topic = $(e.target).data('topic');
+		//console.log(topic);
 		if(this.areaTopic[1]!==topic){
 			this.areaTopic[1]=topic;
 			this.render();
@@ -33,36 +41,52 @@ class CloudApp extends BaseAjax(TweetConfigAjax(Base)){
 
 	loadArea(e){
 		let area = $(e.target).data('area');
+		//console.log(area);
 		if(this.areaTopic[0]!==area){
 			this.areaTopic[0]=area;
 			this.render();
 		}
-		
 	}
 
-	loadStatics(){
-
+	renderMap(){
+		let area = this.areaTopic[0];
+		let topic = this.areaTopic[1];
+		console.log('render map: area:'+ area+', topic: '+topic);
+		//
+	}
+	renderGraph(){
+		console.log('render graph: '+ this.areaTopic[2]);
 	}
 
-	loadGraph(){
-		console.log('load graph');
+
+	loadGraph(e){
+		let subTopic = $(e.target).data('subTopic');
+		this.areaTopic[2] = subTopic;
+		this.renderGraph();
 	}
 
 	render(){
 		console.log('render page');
 		//render title
+		let area = this.areaTopic[0];
+		let topic = this.areaTopic[1];
+		this.title.empty().append(area +' > '+topic);
+		//render sub topic
+		let subTopics = this.areaTopicMap[area][topic];
+
+		this.areaTopic[2] = subTopics[0];
+
+		let content = this.subTab.html();
 		
-		if(this.areaTopic[0]==='Australia'){
-			this.areaTopic[1]='Number of Tweets';
-			this.otherTopics.hide();
-			this.graphContent.hide();
-			console.log(this.graphContent);
-		}else{
-			this.otherTopics.show();
-			this.graphContent.show();
+		this.subTopicArea.empty();
+		let newContent;
+		for(let i in subTopics){
+			newContent = content.replace(/%data%/g,subTopics[i]);
+			this.subTopicArea.append(newContent);
 		}
-		this.title.empty().append(this.areaTopic[0]+' > '+this.areaTopic[1]);
 		//TODO:render map and graphs
+		this.renderMap();
+		this.renderGraph();
 	}
 }
 
@@ -71,8 +95,8 @@ CloudApp.eles = {
 	title: '.js-title',
 	map: '.js-map',
 	graphContent: '#js-graph-content',
-	otherTopics: '#other-topics'
-
+	subTopicArea: '.js-sub-topic',
+	subTab: '.js-sub-tab'
 };
 CloudApp.eventMap = {
 	"click .js-area a": "loadArea",
