@@ -16,13 +16,13 @@ class CloudApp extends BaseAjax(TweetConfigAjax(Base)){
 			'Melbourne':{
 				'Sentiment':['Age','Education','Income'],
 				'Politics':['Age','Education','Income'],
-				'Junk Food':['Age','Income','Health'],
+				'Spelling':['Age','Education','Income'],
 				'Device':['Age','Income']
 			},
 			'Sydney':{
 				'Sentiment':['Age','Education','Income'],
 				'Politics':['Age','Education','Income'],
-				'Junk Food':['Age','Income','Health'],
+				'Spelling':['Age','Education','Income'],
 				'Device':['Age','Income']
 			}
 		};
@@ -117,22 +117,52 @@ class CloudApp extends BaseAjax(TweetConfigAjax(Base)){
 				'Marrickville': 0.11
 			}
 
-		};		
-		this.renderDiagram(topicData);
-		*/
-		
-		
+		};	
+	
+	
+		let topicData = {
+			'Greater Melbourne': {
+				'Docklands': 'Twitter for Android',
+				'Melbourne': 'Twitter for iPhone',
+				'Carlton': 'Twitter for iPhone',
+				'Altona North': 'Twitter for iPhone',
+				'Brunswick': 'Twitter for iPhone',			
+			},
+			'Greater Sydney': {
+				'Mosman': 'Twitter for Android',
+				'Homebush': 'Twitter for Android',
+				'Maroubra': 'Twitter for Android',
+				'Marrickville': 'Twitter for iPhone'
+			}
 
+		};	
+		*/
+		//this.renderDiagram(topicData);
+		/*
+		let temUrl=null;
+		let lapTopUrl=null;
+		lapTopUrl = window.location.href;
+		console.log('laptopurl: '+lapTopUrl);
+		lapTopUrl = lapTopUrl.slice(0, -2);
+		temUrl = lapTopUrl + ':3000' + this.URLs[topic];
+		console.log('actual sent url: '+temUrl);
+	*/
 		//REMOVE COMMENT AFTER API WORKS
 		
 		let temUrl=null;
+		let lapTopUrl=null;
 		let _this = this;
 		if(this.URLs.hasOwnProperty(topic)){
-			temUrl = window.location.href + ':3000' + this.URLs[topic];
+			lapTopUrl = window.location.href;
+			lapTopUrl = lapTopUrl.slice(0, -2);
+			console.log('laptopurl: '+lapTopUrl);
+			temUrl = lapTopUrl + ':3000' + this.URLs[topic];
+			console.log('actual sent url: '+temUrl);
 		}
 		if(temUrl){
 			_this.callAjax(temUrl, _this.renderDiagram.bind(_this), _this.failCallBack);
 		} 	
+		
 		
 	}
 

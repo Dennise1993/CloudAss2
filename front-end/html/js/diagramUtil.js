@@ -9,7 +9,7 @@ class DiagramUtils {
     this.keyTitleMap = {
       'Sentiment': 'average sentiment',
       'Politics': 'ratio political',
-      'Junk Food': 'ratio junk food word',
+      'Spelling': 'correct spelling ratio',
       'Device': 'most devices used'
     };
 
@@ -351,12 +351,12 @@ let subTopicsMap = {
       fileName: '../data/Melbourne/ageIncome.json',
       topicKey: 'Median_Tot_prsnl_inc_weekly',
       areaKey: 'SA2_NAME11'
-    },
+    }/*,
     Health: {
       fileName: '../data/Melbourne/highchol.json',
       topicKey: 'hg_choles_me_2_rate_3_11_7_13',
       areaKey: 'area_name'
-    }
+    }*/
   },
   Sydney: {
     Age: {
@@ -373,12 +373,12 @@ let subTopicsMap = {
       fileName: '../data/Sydney/ageIncome.json',
       topicKey: 'Median_Tot_prsnl_inc_weekly',
       areaKey: 'SA2_NAME11'
-    },
+    }/*,
     Health: {
       fileName: '../data/Sydney/highchol.json',
       topicKey: 'hg_choles_me_2_rate_3_11_7_13',
       areaKey: 'area_name'
-    }
+    }*/
   }      
 };
 
@@ -386,14 +386,12 @@ let subTopicsData = {
   Melbourne: {
     Age: {},
     Education: {},
-    Income: {},
-    Health: {}
+    Income: {}
   },
   Sydney: {
     Age: {},
     Education: {},
-    Income: {},
-    Health: {}
+    Income: {}
   }
 };
 

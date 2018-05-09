@@ -6,7 +6,7 @@ let TweetConfigAjax = (supperclass) => class extends supperclass {
         this.URLs = {
             'Politics': '/political-ratio-suburb',
             'Sentiment': '/sentiment-suburb',
-            'Junk Food': '/junk-food-ratio-suburb',
+            'Spelling': '/correct-spelling-ratio-suburb',
             'Device': '/popular-device-suburb'                
         };
     }
