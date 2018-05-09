@@ -128,13 +128,11 @@ class CloudApp extends BaseAjax(TweetConfigAjax(Base)){
 		let temUrl=null;
 		let _this = this;
 		if(this.URLs.hasOwnProperty(topic)){
-			temUrl = window.location.href + ':3000/' + this.URLs[topic];
+			temUrl = window.location.href + ':3000' + this.URLs[topic];
 		}
 		if(temUrl){
 			_this.callAjax(temUrl, _this.renderDiagram, _this.failCallBack);
-		} 
-		
-		
+		} 	
 	}
 
 	failCallBack(){
