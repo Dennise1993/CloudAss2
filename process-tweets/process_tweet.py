@@ -2,6 +2,7 @@
 import json
 import logging
 import os
+import enchant
 from functools import lru_cache
 
 import pika
@@ -103,6 +104,18 @@ def analysis_sentiment(updated_tweet):
     sentiment = TextBlob(updated_tweet['text'])
     updated_tweet['sentiment'] = sentiment.sentiment.polarity
 
+def analysis_spelling(updated_tweet):
+    updated_tweet['spelling'] = True
+    dic = enchant.Dict("en_US")
+    astr = updated_tweet["text"]
+    alist = astr.split()
+    for word in alist:
+        if not word.startswith("http://") and not word.startswith("https://"):
+            if not word.startswith("#"):
+                if not dic.check(word):
+                    updated_tweet['spelling'] = False
+                    break
+
 
 def process(tweet_json, aus_polygon, aus_region):
     """Process and analyse a tweet from Twitter."""
@@ -123,6 +136,9 @@ def process(tweet_json, aus_polygon, aus_region):
 
     # Analyse the sentiment of the tweet
     analysis_sentiment(updated_tweet)
+
+    # Analyse spelling in English
+    analysis_spelling(updated_tweet)
 
     return updated_tweet
 
