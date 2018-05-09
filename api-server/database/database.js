@@ -104,7 +104,8 @@ const tweetsDesignDoc = {
         },
         correctSpellingRatioBySuburb: {
             map: `function (doc) {
-                if (doc.region && (doc.region === 'Greater Melbourne' ||
+                if (doc.spelling !== undefined && doc.region &&
+                    (doc.region === 'Greater Melbourne' ||
                         doc.region === 'Greater Sydney')) {
                     if (doc.spelling) {
                         emit([doc.region, doc.suburb], 1);
