@@ -1,10 +1,10 @@
 import Base from './base.js';
 import TweetConfigAjax from './tweetConfigAjax.js';
 import BaseAjax from './baseAjax.js';
-import DiagramUtils from './MapUtil.js';
+import DiagramUtils from './diagramUtil.js';
 
 class CloudApp extends BaseAjax(TweetConfigAjax(Base)){
-	constructor(){
+	constructor(subTopicsData){
 		super();
 
 		this.elements = CloudApp.eles;
@@ -19,7 +19,7 @@ class CloudApp extends BaseAjax(TweetConfigAjax(Base)){
 				'Junk Food':['Age','Income','Health'],
 				'Device':['Age','Income']
 			},
-			'Sydeny':{
+			'Sydney':{
 				'Sentiment':['Age','Education','Income'],
 				'Politics':['Age','Education','Income'],
 				'Junk Food':['Age','Income','Health'],
@@ -28,7 +28,7 @@ class CloudApp extends BaseAjax(TweetConfigAjax(Base)){
 		};
 		this.areaTopic=['Melbourne', 'Sentiment', 'Age'];
 
-		this.diagramUtils = new DiagramUtils('#myMap', '#myKey');
+		this.diagramUtils = new DiagramUtils('#myMap', '#myKey', '.js-graph');
 		this.render();
 	}
 
@@ -50,20 +50,28 @@ class CloudApp extends BaseAjax(TweetConfigAjax(Base)){
 		}
 	}
 
-	renderMap(topicData){
+	renderDiagram(topicData){
 		this.map.empty();
 		this.sclaeLine.empty();
+		this.chart.empty();
+		this.toolTip.empty();
 
 		let area = this.areaTopic[0];
 		let topic = this.areaTopic[1];
-		console.log('render map: area:'+ area+', topic: '+topic);
-		this.diagramUtils.drawMapArea(topicData, topic, area);
+		let subTopics = this.areaTopicMap[area][topic];
+		let subTopic = subTopics[0];
+		this.areaTopic[2] = subTopic;
+		console.log('render diagram: area:'+ area+', topic: '+topic +' subTopic: ' + subTopic);
+		this.diagramUtils.drawDiagramArea(topicData, topic, area, subTopic);
+
 	}
 
 	renderGraph(){
-		this.graph.empty();
-		//show and hide stuff
+		this.chart.empty();
+		this.toolTip.empty();
+		this.diagramUtils.drawGraph(this.areaTopic[2]);
 		console.log('render graph: '+ this.areaTopic[2]);
+
 	}
 
 	loadGraph(e){
@@ -73,6 +81,7 @@ class CloudApp extends BaseAjax(TweetConfigAjax(Base)){
 	}
 
 	render(){
+
 		console.log('render page');
 		//render title
 		let area = this.areaTopic[0];
@@ -110,21 +119,22 @@ class CloudApp extends BaseAjax(TweetConfigAjax(Base)){
 
 		};
 
-
-		this.renderMap(topicData);
+		
+		this.renderDiagram(topicData);
 		*/
+
 		//REMOVE COMMENT AFTER API WORKS
 		
 		let temUrl=null;
+		let _this = this;
 		if(this.URLs.hasOwnProperty(topic)){
-			temUrl = window.location.href+this.URLs[topic];
+			temUrl = window.location.href + ':3000/' + this.URLs[topic];
 		}
 		if(temUrl){
-			this.callAjax(temUrl, this.renderMap, this.failCallBack);
+			_this.callAjax(temUrl, _this.renderDiagram, _this.failCallBack);
 		} 
 		
 		
-		this.renderGraph();
 	}
 
 	failCallBack(){
@@ -140,7 +150,9 @@ CloudApp.eles = {
 	graphContent: '#js-graph-content',
 	subTopicArea: '.js-sub-topic',
 	subTab: '.js-sub-tab',
-	graph: 'js-graph'
+	graph: 'js-graph',
+	chart: '#chart',
+	toolTip: '#tooltip'
 };
 CloudApp.eventMap = {
 	"click .js-area a": "loadArea",
