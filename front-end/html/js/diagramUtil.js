@@ -269,7 +269,7 @@ class DiagramUtils {
       .attr('class','circle')
       .attr('cx', (d) => x(d.x))
       .attr('cy', (d) => y(d.y))
-      .attr('r', 5)
+      .attr('r', 2)
       //.style('fill', (d) => d.Doping.length > 2 ? '#C13522' : '#225FC1')
       /*
       .on('mouseover', (d) => {

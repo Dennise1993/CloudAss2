@@ -117,12 +117,10 @@ class CloudApp extends BaseAjax(TweetConfigAjax(Base)){
 				'Marrickville': 0.11
 			}
 
-		};
-
-		
+		};		
 		this.renderDiagram(topicData);
-		
 		*/
+		
 		
 
 		//REMOVE COMMENT AFTER API WORKS
@@ -133,7 +131,7 @@ class CloudApp extends BaseAjax(TweetConfigAjax(Base)){
 			temUrl = window.location.href + ':3000' + this.URLs[topic];
 		}
 		if(temUrl){
-			_this.callAjax(temUrl, _this.renderDiagram, _this.failCallBack);
+			_this.callAjax(temUrl, _this.renderDiagram.bind(_this), _this.failCallBack);
 		} 	
 		
 	}

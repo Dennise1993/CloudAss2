@@ -145,6 +145,102 @@ services:
       - END_MONTH=12
       - END_DAY=1
 
+  harvest_tweets_rich_urls2_5:
+    build: ./harvest-tweets-rich-urls2
+    image: 127.0.0.1:5000/harvest-tweets-rich-uls2
+    networks:
+      - backend
+    deploy:
+      replicas: 1
+    depends_on:
+      - rabbitmq
+    environment:
+      - RABBITMQ_USER=rabbitmq
+      - RABBITMQ_PASS=jerseygrapefruitpetrolcalcium
+      - PYTHONUNBUFFERED=1
+      - SLEEP_TIME=5
+      - LIMIT=5
+      - START_KEY_AREA=r1r0
+      - END_KEY_AREA=r1r7
+      - START_YEAR=2014
+      - START_MONTH=1
+      - START_DAY=1
+      - END_YEAR=2018
+      - END_MONTH=12
+      - END_DAY=1
+
+  harvest_tweets_rich_urls2_6:
+    build: ./harvest-tweets-rich-urls2
+    image: 127.0.0.1:5000/harvest-tweets-rich-uls2
+    networks:
+      - backend
+    deploy:
+      replicas: 1
+    depends_on:
+      - rabbitmq
+    environment:
+      - RABBITMQ_USER=rabbitmq
+      - RABBITMQ_PASS=jerseygrapefruitpetrolcalcium
+      - PYTHONUNBUFFERED=1
+      - SLEEP_TIME=5
+      - LIMIT=5
+      - START_KEY_AREA=r1pp
+      - END_KEY_AREA=r1ps
+      - START_YEAR=2014
+      - START_MONTH=1
+      - START_DAY=1
+      - END_YEAR=2018
+      - END_MONTH=12
+      - END_DAY=1
+
+  harvest_tweets_rich_urls2_7:
+    build: ./harvest-tweets-rich-urls2
+    image: 127.0.0.1:5000/harvest-tweets-rich-uls2
+    networks:
+      - backend
+    deploy:
+      replicas: 1
+    depends_on:
+      - rabbitmq
+    environment:
+      - RABBITMQ_USER=rabbitmq
+      - RABBITMQ_PASS=jerseygrapefruitpetrolcalcium
+      - PYTHONUNBUFFERED=1
+      - SLEEP_TIME=5
+      - LIMIT=5
+      - START_KEY_AREA=r1qb
+      - END_KEY_AREA=r1qd
+      - START_YEAR=2014
+      - START_MONTH=1
+      - START_DAY=1
+      - END_YEAR=2018
+      - END_MONTH=12
+      - END_DAY=1
+
+  harvest_tweets_rich_urls2_8:
+    build: ./harvest-tweets-rich-urls2
+    image: 127.0.0.1:5000/harvest-tweets-rich-uls2
+    networks:
+      - backend
+    deploy:
+      replicas: 1
+    depends_on:
+      - rabbitmq
+    environment:
+      - RABBITMQ_USER=rabbitmq
+      - RABBITMQ_PASS=jerseygrapefruitpetrolcalcium
+      - PYTHONUNBUFFERED=1
+      - SLEEP_TIME=5
+      - LIMIT=5
+      - START_KEY_AREA=r1qf
+      - END_KEY_AREA=r1qg
+      - START_YEAR=2014
+      - START_MONTH=1
+      - START_DAY=1
+      - END_YEAR=2018
+      - END_MONTH=12
+      - END_DAY=1
+
   harvest_tweets_files:
     build: ./harvest-tweets-files
     image: 127.0.0.1:5000/harvest-tweets-files
