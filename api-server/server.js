@@ -32,6 +32,10 @@ app.get('/junk-food-ratio-suburb', function (req, res) {
     req.setTimeout(0);
     genericRequestHandler(req, res, db.junkFoodTweetRatioBySuburb);
 });
+app.get('/correct-spelling-ratio-suburb', function (req, res) {
+    req.setTimeout(0);
+    genericRequestHandler(req, res, db.correctSpellingRatioBySuburb);
+});
 
 const server = app.listen(3000, function () {
     const port = server.address().port;

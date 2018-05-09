@@ -78,7 +78,10 @@ const tweetsDesignDoc = {
         },
         mostPopularDeviceBySuburb: {
             map: `function (doc) {
-                if (doc.source && doc.region &&
+                if (doc.source && 
+                    (doc.source === 'Twitter for iPhone' || 
+                        doc.source === 'Twitter for Android') && 
+                    doc.region &&
                     (doc.region === 'Greater Melbourne' ||
                         doc.region === 'Greater Sydney')) {
                     emit([doc.region, doc.suburb, doc.source], 1);
@@ -91,6 +94,20 @@ const tweetsDesignDoc = {
                 if (doc.region && (doc.region === 'Greater Melbourne' ||
                         doc.region === 'Greater Sydney')) {
                     if (doc.junkFoodList) {
+                        emit([doc.region, doc.suburb], 1);
+                    } else {
+                        emit([doc.region, doc.suburb], 0);
+                    }
+                }
+            }`,
+            reduce: averageReduceFunction
+        },
+        correctSpellingRatioBySuburb: {
+            map: `function (doc) {
+                if (doc.spelling !== undefined && doc.region &&
+                    (doc.region === 'Greater Melbourne' ||
+                        doc.region === 'Greater Sydney')) {
+                    if (doc.spelling) {
                         emit([doc.region, doc.suburb], 1);
                     } else {
                         emit([doc.region, doc.suburb], 0);
@@ -208,9 +225,17 @@ function junkFoodTweetRatioBySuburb(callback) {
         });
 }
 
+function correctSpellingRatioBySuburb(callback) {
+    db.view(tweetsDesignDocName + '/correctSpellingRatioBySuburb',
+        {group: true}, function (err, res) {
+            mergeRegionSuburbAverageResults(err, res, callback)
+        });
+}
+
 module.exports = {
     politicalTweetRatioBySuburb,
     sentimentBySuburb,
     mostPopularDeviceBySuburb,
     junkFoodTweetRatioBySuburb,
+    correctSpellingRatioBySuburb,
 };

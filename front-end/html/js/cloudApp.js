@@ -100,8 +100,8 @@ class CloudApp extends BaseAjax(TweetConfigAjax(Base)){
 			newContent = content.replace(/%data%/g,subTopics[i]);
 			this.subTopicArea.append(newContent);
 		}
+		
 		/*
-
 		let topicData = {
 			'Greater Melbourne': {
 				'Docklands': 0.1,
@@ -121,19 +121,20 @@ class CloudApp extends BaseAjax(TweetConfigAjax(Base)){
 
 		
 		this.renderDiagram(topicData);
+		
 		*/
+		
 
 		//REMOVE COMMENT AFTER API WORKS
 		
 		let temUrl=null;
 		let _this = this;
 		if(this.URLs.hasOwnProperty(topic)){
-			temUrl = window.location.href + ':3000/' + this.URLs[topic];
+			temUrl = window.location.href + ':3000' + this.URLs[topic];
 		}
 		if(temUrl){
 			_this.callAjax(temUrl, _this.renderDiagram, _this.failCallBack);
-		} 
-		
+		} 	
 		
 	}
 
