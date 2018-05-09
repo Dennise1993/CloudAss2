@@ -17,15 +17,19 @@ function genericRequestHandler(req, res, getResponse) {
 }
 
 app.get('/political-ratio-suburb', function (req, res) {
+    req.setTimeout(0);
     genericRequestHandler(req, res, db.politicalTweetRatioBySuburb);
 });
 app.get('/sentiment-suburb', function (req, res) {
+    req.setTimeout(0);
     genericRequestHandler(req, res, db.sentimentBySuburb);
 });
 app.get('/popular-device-suburb', function (req, res) {
+    req.setTimeout(0);
     genericRequestHandler(req, res, db.mostPopularDeviceBySuburb);
 });
 app.get('/junk-food-ratio-suburb', function (req, res) {
+    req.setTimeout(0);
     genericRequestHandler(req, res, db.junkFoodTweetRatioBySuburb);
 });
 
