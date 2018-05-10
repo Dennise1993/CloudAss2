@@ -209,7 +209,7 @@ function correctSpellingRatioBySuburb(callback) {
 module.exports = {
     politicalTweetRatioBySuburb,
     sentimentBySuburb,
-    mostPopularDeviceBySuburb,
+    appleOrAndroidDeviceBySuburb,
     junkFoodTweetRatioBySuburb,
     correctSpellingRatioBySuburb,
 };
