@@ -7,7 +7,7 @@ let TweetConfigAjax = (supperclass) => class extends supperclass {
             'Politics': '/political-ratio-suburb',
             'Sentiment': '/sentiment-suburb',
             'Spelling': '/correct-spelling-ratio-suburb',
-            'Device': '/popular-device-suburb'                
+            'Device': '/apple-or-android-device-surburb'                
         };
     }
 };
