@@ -79,18 +79,19 @@ const tweetsDesignDoc = {
             }`,
             reduce: averageReduceFunction
         },
-        mostPopularDeviceBySuburb: {
+        appleOrAndroidDeviceBySuburb: {
             map: `function (doc) {
-                if (doc.source && 
-                    (doc.source === 'Twitter for iPhone' || 
-                        doc.source === 'Twitter for Android') && 
-                    doc.region &&
+                if (doc.source && doc.region &&
                     (doc.region === 'Greater Melbourne' ||
                         doc.region === 'Greater Sydney')) {
-                    emit([doc.region, doc.suburb, doc.source], 1);
+                    if (doc.source === 'Twitter for iPhone') {
+                        emit([doc.region, doc.suburb, doc.source], 1);
+                    } else if (doc.source === 'Twitter for Android') {
+                        emit([doc.region, doc.suburb, doc.source], 0);
+                    }
                 }
             }`,
-            reduce: '_count'
+            reduce: averageReduceFunction
         },
         junkFoodRatioBySuburb: {
             map: `function (doc) {
@@ -184,40 +185,10 @@ function sentimentBySuburb(callback) {
         });
 }
 
-function mostPopularDeviceBySuburb(callback) {
-    db.view(tweetsDesignDocName + '/mostPopularDeviceBySuburb', {group: true},
-        function (err, res) {
-            if (!err) {
-                // Determine the device with the most frequency
-                const deviceCounts = {};
-                for (let subResponse of res) {
-                    const region = subResponse['key'][0];
-                    const suburb = subResponse['key'][1];
-                    const device = subResponse['key'][2];
-                    const count = subResponse['value'];
-
-                    deviceCounts[region] = deviceCounts[region] || {};
-                    if ((!(suburb in deviceCounts[region]) ||
-                            count > deviceCounts[region][suburb]['count'])) {
-                        deviceCounts[region][suburb] = {
-                            device: device,
-                            count: count
-                        };
-                    }
-                }
-
-                // Remove the count field from our results
-                let results = {};
-                for (const [region, regionDict] of Object.entries(deviceCounts)) {
-                    for (const [suburb, suburbDict] of Object.entries(regionDict)) {
-                        results[region] = results[region] || {};
-                        results[region][suburb] = suburbDict['device'];
-                    }
-                }
-                callback(err, results);
-            } else {
-                callback(err, res);
-            }
+function appleOrAndroidDeviceBySuburb(callback) {
+    db.view(tweetsDesignDocName + '/appleOrAndroidDeviceBySuburb',
+        {group: true}, function (err, res) {
+            mergeRegionSuburbAverageResults(err, res, callback)
         });
 }
 
