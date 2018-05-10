@@ -1,19 +1,11 @@
-'''
-    * Team 10
-    * New York
-    * Fengmin Deng      659332
-    * Jiajie Li         631482
-    * Shuangchao Yin    612511
-    * Weijia Chen       616213
-    * Yun Shi           621761
-'''
+
 import boto
 from boto.ec2.regioninfo import RegionInfo
 
 #connect the cloud with EC2
 region=RegionInfo(name='melbourne', endpoint='nova.rc.nectar.org.au')
-ec2_conn = boto.connect_ec2(aws_access_key_id='2e9e79d520114de69c3653d04cf2ac3b', 
-		aws_secret_access_key='0fedbb1686264bac99dd4ac83218620a', is_secure=True, region=region, port=8773, 
+ec2_conn = boto.connect_ec2(aws_access_key_id='c6789431068d4598b738df4346735fed',
+		aws_secret_access_key='8984d9e386784af8811fe464fd344ea6', is_secure=True, region=region, port=8773, 
 			path='/services/Cloud', validate_certs=False)
 
 #get all the volume IDs
