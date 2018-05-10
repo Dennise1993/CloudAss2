@@ -24,7 +24,7 @@ app.get('/sentiment-suburb', function (req, res) {
     req.setTimeout(0);
     genericRequestHandler(req, res, db.sentimentBySuburb);
 });
-app.get('/popular-device-suburb', function (req, res) {
+app.get('/apple-or-android-device-suburb', function (req, res) {
     req.setTimeout(0);
     genericRequestHandler(req, res, db.mostPopularDeviceBySuburb);
 });
