@@ -6,9 +6,6 @@ const db = new (cradle.Connection)('couchdb', 5984, {
     auth: {
         username: process.env.COUCHDB_USER,
         password: process.env.COUCHDB_PASSWORD
-    },
-    request: {
-        timeout: 120000
     }
 }).database('tweets');
 
